@@ -1,13 +1,20 @@
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
-import { MockTest, MockFilters, SectionPerformance } from '../types/mock';
+import { 
+  MockTest, 
+  MockFilters, 
+  SectionPerformance, 
+  SubjectDefinition, 
+  ChapterDefinition, 
+  ChapterMasterySummary 
+} from '../types/mock';
 import { OverallKPIs, SubjectStat, WeakSectionDiagnosis, PerformanceInsight } from '../types/analytics';
 import { UserSettings } from '../types/settings';
 import { MockRepository } from '../data/mockRepository';
-import { StorageService, DEFAULT_PLATFORMS } from '../data/storage';
+import { StorageService, DEFAULT_PLATFORMS, DEFAULT_SUBJECTS_AND_CHAPTERS } from '../data/storage';
 import { calculateOverallKPIs, calculateSubjectStats } from '../engine/analyticsEngine';
 import { diagnoseWeakSections, generatePerformanceInsights } from '../engine/feedbackEngine';
 
-export type NavView = 'home' | 'mocks' | 'full-length' | 'sectional' | 'analytics' | 'percentile' | 'settings';
+export type NavView = 'home' | 'mocks' | 'full-length' | 'sectional' | 'chapter-wise' | 'analytics' | 'percentile' | 'settings';
 
 interface ToastNotification {
   id: string;
@@ -15,11 +22,23 @@ interface ToastNotification {
   message: string;
 }
 
+export interface OverallChapterProgress {
+  totalChapters: number;
+  mastered: number;
+  strong: number;
+  needsPractice: number;
+  notStarted: number;
+  totalChapterTests: number;
+  avgChapterAccuracy: number;
+  completionRate: number;
+}
+
 interface MockContextType {
   // State
   mocks: MockTest[];
   fullLengthMocks: MockTest[];
   sectionalMocks: MockTest[];
+  chapterMocks: MockTest[];
   activeView: NavView;
   setActiveView: (view: NavView) => void;
   filters: MockFilters;
@@ -30,6 +49,15 @@ interface MockContextType {
   settings: UserSettings;
   updateSettings: (newSettings: Partial<UserSettings>) => void;
   
+  // Chapter & Subject Management
+  subjectsWithChapters: SubjectDefinition[];
+  addCustomChapter: (subjectName: string, chapterName: string, subtopics?: string[], targetAccuracy?: number) => ChapterDefinition;
+  deleteCustomChapter: (subjectName: string, chapterId: string) => void;
+  addCustomSubject: (name: string, icon?: string, color?: string) => SubjectDefinition;
+  deleteCustomSubject: (subjectId: string) => void;
+  getChapterMasterySummary: (subjectName: string, chapterName: string) => ChapterMasterySummary;
+  overallChapterMastery: OverallChapterProgress;
+
   // Analytics
   kpis: OverallKPIs;
   fullLengthKPIs: OverallKPIs;
@@ -92,6 +120,7 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [mocks, setMocks] = useState<MockTest[]>(() => repository.getAll());
   const [settings, setSettings] = useState<UserSettings>(() => StorageService.loadSettings());
   const [customPlatforms, setCustomPlatforms] = useState<string[]>(() => StorageService.loadCustomPlatforms());
+  const [subjectsWithChapters, setSubjectsWithChapters] = useState<SubjectDefinition[]>(() => StorageService.loadSubjectsWithChapters());
   const [activeView, setActiveView] = useState<NavView>('home');
   const [filters, setFilters] = useState<MockFilters>(defaultFilters);
   const [selectedMockIds, setSelectedMockIds] = useState<string[]>([]);
@@ -127,6 +156,104 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
     showToast('Settings saved successfully');
   }, [showToast]);
 
+  // Chapter & Subject Management
+  const addCustomChapter = useCallback((subjectName: string, chapterName: string, subtopics: string[] = [], targetAccuracy = 85) => {
+    const trimmedChapter = chapterName.trim();
+    if (!trimmedChapter) throw new Error('Chapter name is required');
+
+    const newChapter: ChapterDefinition = {
+      id: `ch-custom-${Date.now()}`,
+      subject: subjectName,
+      chapterName: trimmedChapter,
+      targetAccuracy,
+      subtopics,
+      isCustom: true
+    };
+
+    setSubjectsWithChapters(prev => {
+      const exists = prev.find(s => s.name.toLowerCase() === subjectName.toLowerCase());
+      let updated: SubjectDefinition[];
+      if (exists) {
+        updated = prev.map(s => {
+          if (s.name.toLowerCase() === subjectName.toLowerCase()) {
+            return {
+              ...s,
+              chapters: [...s.chapters, newChapter]
+            };
+          }
+          return s;
+        });
+      } else {
+        const newSub: SubjectDefinition = {
+          id: `sub-custom-${Date.now()}`,
+          name: subjectName,
+          icon: '📚',
+          color: '#10B981',
+          chapters: [newChapter],
+          isCustom: true
+        };
+        updated = [...prev, newSub];
+      }
+      StorageService.saveSubjectsWithChapters(updated);
+      return updated;
+    });
+
+    showToast(`Chapter "${trimmedChapter}" added to ${subjectName}!`);
+    return newChapter;
+  }, [showToast]);
+
+  const deleteCustomChapter = useCallback((subjectName: string, chapterId: string) => {
+    setSubjectsWithChapters(prev => {
+      const updated = prev.map(s => {
+        if (s.name.toLowerCase() === subjectName.toLowerCase()) {
+          return {
+            ...s,
+            chapters: s.chapters.filter(ch => ch.id !== chapterId)
+          };
+        }
+        return s;
+      });
+      StorageService.saveSubjectsWithChapters(updated);
+      return updated;
+    });
+    showToast('Chapter removed.', 'info');
+  }, [showToast]);
+
+  const addCustomSubject = useCallback((name: string, icon = '📚', color = '#10B981') => {
+    const trimmed = name.trim();
+    if (!trimmed) throw new Error('Subject name is required');
+
+    const newSub: SubjectDefinition = {
+      id: `sub-custom-${Date.now()}`,
+      name: trimmed,
+      icon,
+      color,
+      chapters: [],
+      isCustom: true
+    };
+
+    setSubjectsWithChapters(prev => {
+      if (prev.some(s => s.name.toLowerCase() === trimmed.toLowerCase())) {
+        return prev;
+      }
+      const updated = [...prev, newSub];
+      StorageService.saveSubjectsWithChapters(updated);
+      return updated;
+    });
+
+    showToast(`Subject "${trimmed}" created!`);
+    return newSub;
+  }, [showToast]);
+
+  const deleteCustomSubject = useCallback((subjectId: string) => {
+    setSubjectsWithChapters(prev => {
+      const updated = prev.filter(s => s.id !== subjectId);
+      StorageService.saveSubjectsWithChapters(updated);
+      return updated;
+    });
+    showToast('Subject removed.', 'info');
+  }, [showToast]);
+
   // Derived Full Length mocks
   const fullLengthMocks = useMemo(() => {
     return mocks.filter(m => m.mockType === 'FULL_LENGTH');
@@ -136,6 +263,112 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const sectionalMocks = useMemo(() => {
     return mocks.filter(m => m.mockType === 'SECTIONAL' || m.mockType === 'SUBJECT');
   }, [mocks]);
+
+  // Derived Chapter-Wise tests
+  const chapterMocks = useMemo(() => {
+    return mocks.filter(m => m.mockType === 'CHAPTER_WISE');
+  }, [mocks]);
+
+  // Computed Chapter Mastery Summary for any chapter
+  const getChapterMasterySummary = useCallback((subjectName: string, chapterName: string): ChapterMasterySummary => {
+    const tests = chapterMocks.filter(m => 
+      (m.chapterName && m.chapterName.toLowerCase() === chapterName.toLowerCase()) ||
+      (m.topicFocus && m.topicFocus.toLowerCase().includes(chapterName.toLowerCase())) ||
+      (m.testName && m.testName.toLowerCase().includes(chapterName.toLowerCase()))
+    );
+
+    if (tests.length === 0) {
+      return {
+        subject: subjectName,
+        chapterName,
+        totalTests: 0,
+        totalQuestions: 0,
+        attempted: 0,
+        correct: 0,
+        wrong: 0,
+        avgAccuracy: 0,
+        avgScore: 0,
+        avgPaceSeconds: 0,
+        bestScore: 0,
+        maxMarks: 0,
+        masteryStatus: 'Not Started',
+        recentTests: []
+      };
+    }
+
+    const totalQuestions = tests.reduce((acc, t) => acc + t.totalQuestions, 0);
+    const attempted = tests.reduce((acc, t) => acc + t.attempted, 0);
+    const correct = tests.reduce((acc, t) => acc + t.correct, 0);
+    const wrong = tests.reduce((acc, t) => acc + t.wrong, 0);
+    const avgAccuracy = attempted > 0 ? (correct / attempted) * 100 : 0;
+    const avgScore = tests.reduce((acc, t) => acc + t.score, 0) / tests.length;
+    const bestScore = Math.max(...tests.map(t => t.score));
+    const maxMarks = tests[0]?.maxMarks || 50;
+
+    const totalTimeMinutes = tests.reduce((acc, t) => acc + t.timeTakenMinutes, 0);
+    const avgPaceSeconds = attempted > 0 ? Math.round((totalTimeMinutes * 60) / attempted) : 0;
+
+    let masteryStatus: 'Mastered' | 'Strong' | 'Needs Practice' | 'Not Started' = 'Needs Practice';
+    if (avgAccuracy >= 85) masteryStatus = 'Mastered';
+    else if (avgAccuracy >= 70) masteryStatus = 'Strong';
+
+    return {
+      subject: subjectName,
+      chapterName,
+      totalTests: tests.length,
+      totalQuestions,
+      attempted,
+      correct,
+      wrong,
+      avgAccuracy: parseFloat(avgAccuracy.toFixed(1)),
+      avgScore: parseFloat(avgScore.toFixed(1)),
+      avgPaceSeconds,
+      bestScore: parseFloat(bestScore.toFixed(1)),
+      maxMarks,
+      masteryStatus,
+      recentTests: tests.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    };
+  }, [chapterMocks]);
+
+  // Overall Chapter Progress across all subjects
+  const overallChapterMastery = useMemo<OverallChapterProgress>(() => {
+    let allChaptersCount = 0;
+    let masteredCount = 0;
+    let strongCount = 0;
+    let needsPracticeCount = 0;
+    let notStartedCount = 0;
+
+    subjectsWithChapters.forEach(sub => {
+      sub.chapters.forEach(ch => {
+        allChaptersCount++;
+        const summary = getChapterMasterySummary(sub.name, ch.chapterName);
+        if (summary.masteryStatus === 'Mastered') masteredCount++;
+        else if (summary.masteryStatus === 'Strong') strongCount++;
+        else if (summary.masteryStatus === 'Needs Practice') needsPracticeCount++;
+        else notStartedCount++;
+      });
+    });
+
+    const totalChapterTests = chapterMocks.length;
+    const avgChapterAccuracy = chapterMocks.length > 0
+      ? chapterMocks.reduce((acc, m) => acc + m.accuracy, 0) / chapterMocks.length
+      : 0;
+
+    const completionRate = allChaptersCount > 0
+      ? ((masteredCount + strongCount) / allChaptersCount) * 100
+      : 0;
+
+    return {
+      totalChapters: allChaptersCount,
+      mastered: masteredCount,
+      strong: strongCount,
+      needsPractice: needsPracticeCount,
+      notStarted: notStartedCount,
+      totalChapterTests,
+      avgChapterAccuracy: parseFloat(avgChapterAccuracy.toFixed(1)),
+      completionRate: parseFloat(completionRate.toFixed(1))
+    };
+  }, [subjectsWithChapters, chapterMocks, getChapterMasterySummary]);
 
   // Filtered mocks list
   const filteredMocks = useMemo(() => {
@@ -237,7 +470,9 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const reset = repository.resetDemoData();
     setMocks(reset);
     setSelectedMockIds([]);
-    showToast('Reset to default 10 sample mocks.', 'info');
+    setSubjectsWithChapters(DEFAULT_SUBJECTS_AND_CHAPTERS);
+    StorageService.saveSubjectsWithChapters(DEFAULT_SUBJECTS_AND_CHAPTERS);
+    showToast('Reset to default sample mocks & syllabus.', 'info');
   }, [showToast]);
 
   const clearAllData = useCallback(() => {
@@ -287,6 +522,7 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
         mocks,
         fullLengthMocks,
         sectionalMocks,
+        chapterMocks,
         activeView,
         setActiveView,
         filters,
@@ -296,6 +532,13 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSelectedMockIds,
         settings,
         updateSettings,
+        subjectsWithChapters,
+        addCustomChapter,
+        deleteCustomChapter,
+        addCustomSubject,
+        deleteCustomSubject,
+        getChapterMasterySummary,
+        overallChapterMastery,
         kpis,
         fullLengthKPIs,
         subjectStats,

@@ -12,6 +12,7 @@ import { HomeView } from './views/HomeView';
 import { MocksView } from './views/MocksView';
 import { FullLengthView } from './views/FullLengthView';
 import { SectionalView } from './views/SectionalView';
+import { ChapterWiseView } from './views/ChapterWiseView';
 import { AnalyticsView } from './views/AnalyticsView';
 import { PercentileView } from './views/PercentileView';
 import { SettingsView } from './views/SettingsView';
@@ -30,6 +31,7 @@ const AppContent: React.FC = () => {
         {activeView === 'mocks' && <MocksView />}
         {activeView === 'full-length' && <FullLengthView />}
         {activeView === 'sectional' && <SectionalView />}
+        {activeView === 'chapter-wise' && <ChapterWiseView />}
         {activeView === 'analytics' && <AnalyticsView />}
         {activeView === 'percentile' && <PercentileView />}
         {activeView === 'settings' && <SettingsView />}

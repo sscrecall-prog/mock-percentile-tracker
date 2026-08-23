@@ -9,7 +9,7 @@ export const MobileNavigation: React.FC = () => {
     { id: 'home', label: 'Home', icon: <Layers className="w-5 h-5" /> },
     { id: 'full-length', label: 'Full', icon: <Target className="w-5 h-5" /> },
     { id: 'sectional', label: 'Drills', icon: <Zap className="w-5 h-5" /> },
-    { id: 'mocks', label: 'All', icon: <BookOpen className="w-5 h-5" /> },
+    { id: 'chapter-wise', label: 'Chapters', icon: <BookOpen className="w-5 h-5" /> },
     { id: 'analytics', label: 'Analytics', icon: <BarChart2 className="w-5 h-5" /> },
   ];
 

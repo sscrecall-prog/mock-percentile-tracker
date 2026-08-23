@@ -2,7 +2,7 @@ export type ExamType = 'SSC CGL' | 'SSC CHSL' | 'SSC MTS' | 'RRB NTPC' | 'IBPS P
 
 export type ExamTier = 'Tier 1' | 'Tier 2' | 'Prelims' | 'Mains' | 'General';
 
-export type MockTestType = 'FULL_LENGTH' | 'SECTIONAL' | 'SUBJECT' | 'PYQ' | 'CUSTOM';
+export type MockTestType = 'FULL_LENGTH' | 'SECTIONAL' | 'CHAPTER_WISE' | 'SUBJECT' | 'PYQ' | 'CUSTOM';
 
 export type SectionName = 
   | 'Quantitative Aptitude'
@@ -11,6 +11,41 @@ export type SectionName =
   | 'General Awareness'
   | 'Computer Knowledge'
   | 'Custom';
+
+export interface ChapterDefinition {
+  id: string;
+  subject: string;
+  chapterName: string;
+  targetAccuracy: number; // e.g. 85
+  subtopics?: string[];
+  isCustom?: boolean;
+}
+
+export interface SubjectDefinition {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  chapters: ChapterDefinition[];
+  isCustom?: boolean;
+}
+
+export interface ChapterMasterySummary {
+  subject: string;
+  chapterName: string;
+  totalTests: number;
+  totalQuestions: number;
+  attempted: number;
+  correct: number;
+  wrong: number;
+  avgAccuracy: number;
+  avgScore: number;
+  avgPaceSeconds: number;
+  bestScore: number;
+  maxMarks: number;
+  masteryStatus: 'Mastered' | 'Strong' | 'Needs Practice' | 'Not Started';
+  recentTests: MockTest[];
+}
 
 export interface SectionPerformance {
   id: string;
@@ -58,6 +93,8 @@ export interface MockTest {
   isClearedCutoff: boolean;
   subjectName?: SectionName;
   topicFocus?: string;
+  chapterName?: string;
+  difficulty?: 'Easy' | 'Moderate' | 'Hard' | 'Mixed';
   sections: SectionPerformance[];
   weakAreas: string[];
   analysisNotes?: string;
@@ -69,6 +106,7 @@ export interface MockFilters {
   exam: ExamType | 'ALL';
   platform?: string | 'ALL';
   subject?: SectionName | 'ALL';
+  chapter?: string | 'ALL';
   tier: ExamTier | 'ALL';
   mockType: MockTestType | 'ALL';
   cutoffStatus: 'ALL' | 'CLEARED' | 'NOT_CLEARED';

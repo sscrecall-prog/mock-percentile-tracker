@@ -23,8 +23,9 @@ export const Navbar: React.FC = () => {
   const navItems: { id: NavView; label: string; icon: React.ReactNode; badge?: string }[] = [
     { id: 'home', label: 'Home', icon: <Layers className="w-4 h-4" /> },
     { id: 'full-length', label: 'Full Length', icon: <Target className="w-4 h-4" /> },
-    { id: 'sectional', label: 'Sectionals', icon: <Zap className="w-4 h-4" />, badge: 'New' },
-    { id: 'mocks', label: 'All Mocks', icon: <BookOpen className="w-4 h-4" /> },
+    { id: 'sectional', label: 'Sectionals', icon: <Zap className="w-4 h-4" /> },
+    { id: 'chapter-wise', label: 'Chapter Wise', icon: <BookOpen className="w-4 h-4" />, badge: 'New' },
+    { id: 'mocks', label: 'All Mocks', icon: <Layers className="w-4 h-4" /> },
     { id: 'percentile', label: 'Percentile', icon: <TrendingUp className="w-4 h-4" /> },
     { id: 'analytics', label: 'Analytics', icon: <BarChart2 className="w-4 h-4" /> },
     { id: 'settings', label: 'Settings', icon: <SettingsIcon className="w-4 h-4" /> },

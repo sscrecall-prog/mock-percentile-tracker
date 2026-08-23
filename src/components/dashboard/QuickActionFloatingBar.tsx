@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Target, BarChart2, TrendingUp, Zap } from 'lucide-react';
+import { Plus, Target, BarChart2, TrendingUp, Zap, BookOpen } from 'lucide-react';
 import { useMocks } from '../../context/MockContext';
 import { Card3DTilt } from '../3d/Card3DTilt';
 
@@ -9,9 +9,9 @@ export const QuickActionFloatingBar: React.FC = () => {
   const actions = [
     {
       label: 'Log Mock Test',
-      desc: 'Full mock or sectional',
+      desc: 'Full, Sectional or Chapter',
       icon: <Plus className="w-5 h-5 text-darkBg" />,
-      color: 'bg-gradient-to-r from-electric-blue to-mint text-darkBg',
+      color: 'bg-gradient-to-r from-emerald-500 to-amber-500 text-darkBg',
       onClick: () => {
         setEditingMock(null);
         setIsAddModalOpen(true);
@@ -32,11 +32,11 @@ export const QuickActionFloatingBar: React.FC = () => {
       onClick: () => setActiveView('sectional')
     },
     {
-      label: 'Percentile Tracker',
-      desc: 'Orbit ring & target gap',
-      icon: <TrendingUp className="w-5 h-5 text-purple-600 dark:text-lavender" />,
-      color: 'bg-white dark:bg-darkSurface border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:border-slate-300 dark:hover:border-lavender/40 shadow-sm',
-      onClick: () => setActiveView('percentile')
+      label: 'Chapter Wise Mastery',
+      desc: 'Topic tests & syllabus progress',
+      icon: <BookOpen className="w-5 h-5 text-amber-500" />,
+      color: 'bg-white dark:bg-darkSurface border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:border-slate-300 dark:hover:border-amber-500/40 shadow-sm',
+      onClick: () => setActiveView('chapter-wise')
     },
   ];
 

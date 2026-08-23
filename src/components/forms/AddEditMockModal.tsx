@@ -34,7 +34,9 @@ export const AddEditMockModal: React.FC = () => {
     addMock, 
     editMock,
     customPlatforms,
-    addCustomPlatform
+    addCustomPlatform,
+    subjectsWithChapters,
+    addCustomChapter
   } = useMocks();
 
   const [testName, setTestName] = useState('');
@@ -42,6 +44,10 @@ export const AddEditMockModal: React.FC = () => {
   const [tier, setTier] = useState<ExamTier>('Tier 1');
   const [mockType, setMockType] = useState<MockTestType>('FULL_LENGTH');
   const [subjectName, setSubjectName] = useState<SectionName>('Quantitative Aptitude');
+  const [chapterName, setChapterName] = useState<string>('Percentage & Fractional Values');
+  const [difficulty, setDifficulty] = useState<'Easy' | 'Moderate' | 'Hard' | 'Mixed'>('Moderate');
+  const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
+  const [newChapterInput, setNewChapterInput] = useState('');
   const [topicFocus, setTopicFocus] = useState('');
   const [testPlatform, setTestPlatform] = useState('Testbook');
   const [isAddingCustomPlatform, setIsAddingCustomPlatform] = useState(false);
@@ -67,10 +73,33 @@ export const AddEditMockModal: React.FC = () => {
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const isSectional = mockType === 'SECTIONAL' || mockType === 'SUBJECT';
+  const isChapterWise = mockType === 'CHAPTER_WISE';
+  const isSingleMode = isSectional || isChapterWise;
+
+  // Active subject's chapters list
+  const currentSubjectChapters = subjectsWithChapters.find(
+    s => s.name.toLowerCase() === subjectName.toLowerCase()
+  )?.chapters || [];
 
   const handleMockTypeSwitch = (type: MockTestType) => {
     setMockType(type);
-    if (type === 'SECTIONAL' || type === 'SUBJECT') {
+    if (type === 'CHAPTER_WISE') {
+      setTotalQuestions(15);
+      setMaxMarks(30);
+      setTotalTimeMinutes(15);
+      setTimeTakenMinutes(12);
+      setAttempted(15);
+      setCorrect(13);
+      setWrong(2);
+      setCutoffMarks(22);
+      setPercentile(94.0);
+      const activeSub = subjectsWithChapters.find(s => s.name.toLowerCase() === subjectName.toLowerCase()) || subjectsWithChapters[0];
+      const initialCh = activeSub?.chapters[0]?.chapterName || 'Percentage & Fractional Values';
+      setChapterName(initialCh);
+      if (!editingMock) {
+        setTestName(`${initialCh} Drill #1`);
+      }
+    } else if (type === 'SECTIONAL' || type === 'SUBJECT') {
       setTotalQuestions(25);
       setMaxMarks(50);
       setTotalTimeMinutes(20);
@@ -106,6 +135,8 @@ export const AddEditMockModal: React.FC = () => {
       setTier(editingMock.tier);
       setMockType(editingMock.mockType);
       setSubjectName(editingMock.subjectName || (editingMock.sections[0]?.sectionName as SectionName) || 'Quantitative Aptitude');
+      setChapterName(editingMock.chapterName || 'Percentage & Fractional Values');
+      setDifficulty(editingMock.difficulty || 'Moderate');
       setTopicFocus(editingMock.topicFocus || editingMock.weakAreas?.join(', ') || '');
       setTestPlatform(editingMock.testPlatform);
       setDate(editingMock.date);
@@ -141,6 +172,8 @@ export const AddEditMockModal: React.FC = () => {
       setTier('Tier 1');
       setMockType('FULL_LENGTH');
       setSubjectName('Quantitative Aptitude');
+      setChapterName('Percentage & Fractional Values');
+      setDifficulty('Moderate');
       setTopicFocus('');
       setTestPlatform('Testbook');
       setDate(new Date().toISOString().split('T')[0]);
@@ -230,9 +263,28 @@ export const AddEditMockModal: React.FC = () => {
     e.preventDefault();
     
     let formattedSections: SectionPerformance[] = [];
-
-    if (isSectional) {
-      // Single-section drill: create 1 section directly matching subject
+    if (!isSingleMode) {
+      formattedSections = sections.map((s, idx) => {
+        const marksPerQ = s.totalQuestions > 0 ? s.maxMarks / s.totalQuestions : 2;
+        const metrics = calculateSectionMetrics(s.totalQuestions, s.correct, s.wrong, marksPerQ, marksPerQ * 0.25, s.timeTakenMinutes);
+        return {
+          id: `sec-${Date.now()}-${idx}`,
+          mockId: editingMock?.id || 'temp',
+          sectionName: s.sectionName,
+          customName: s.customName,
+          totalQuestions: s.totalQuestions,
+          attempted: s.attempted,
+          correct: s.correct,
+          wrong: s.wrong,
+          unattempted: Math.max(0, s.totalQuestions - s.attempted),
+          maxMarks: s.maxMarks,
+          score: metrics.score,
+          accuracy: metrics.accuracy,
+          timeTakenMinutes: s.timeTakenMinutes,
+          status: metrics.accuracy >= 90 ? 'Mastered' : metrics.accuracy >= 75 ? 'Strong' : metrics.accuracy >= 60 ? 'Average' : 'Needs Improvement'
+        };
+      });
+    } else {
       formattedSections = [{
         id: `sec-${Date.now()}-1`,
         mockId: editingMock ? editingMock.id : 'temp',
@@ -249,36 +301,6 @@ export const AddEditMockModal: React.FC = () => {
         timeTakenMinutes,
         status: accuracy >= 90 ? 'Mastered' : accuracy >= 75 ? 'Strong' : accuracy >= 60 ? 'Average' : 'Needs Improvement'
       }];
-    } else {
-      // Full Length: use section breakdown
-      formattedSections = sections.map((s, idx) => {
-        const marksPerQ = s.totalQuestions > 0 ? s.maxMarks / s.totalQuestions : 2;
-        const metrics = calculateSectionMetrics(
-          s.totalQuestions,
-          s.correct,
-          s.wrong,
-          marksPerQ,
-          marksPerQ * 0.25,
-          s.timeTakenMinutes
-        );
-
-        return {
-          id: `sec-${Date.now()}-${idx}`,
-          mockId: editingMock ? editingMock.id : 'temp',
-          sectionName: s.sectionName,
-          customName: s.customName,
-          totalQuestions: s.totalQuestions,
-          attempted: s.attempted,
-          correct: s.correct,
-          wrong: s.wrong,
-          unattempted: Math.max(0, s.totalQuestions - s.attempted),
-          maxMarks: s.maxMarks,
-          score: metrics.score,
-          accuracy: metrics.accuracy,
-          timeTakenMinutes: s.timeTakenMinutes,
-          status: metrics.accuracy >= 90 ? 'Mastered' : metrics.accuracy >= 75 ? 'Strong' : metrics.accuracy >= 60 ? 'Average' : 'Needs Improvement'
-        };
-      });
     }
 
     const mockPayload: Omit<MockTest, 'id' | 'createdAt'> = {
@@ -286,7 +308,9 @@ export const AddEditMockModal: React.FC = () => {
       exam,
       tier,
       mockType,
-      subjectName: isSectional ? subjectName : undefined,
+      subjectName: isSingleMode ? subjectName : undefined,
+      chapterName: isChapterWise ? chapterName : undefined,
+      difficulty: isChapterWise ? difficulty : undefined,
       topicFocus: topicFocus.trim() || undefined,
       testPlatform,
       date,
@@ -308,9 +332,11 @@ export const AddEditMockModal: React.FC = () => {
       cutoffMarks,
       isClearedCutoff: calculatedScore >= cutoffMarks,
       sections: formattedSections,
-      weakAreas: isSectional 
-        ? (topicFocus ? [topicFocus] : [])
-        : formattedSections.filter(s => s.accuracy < 75).map(s => `${s.sectionName} Accuracy`),
+      weakAreas: isChapterWise 
+        ? (topicFocus ? [topicFocus] : (chapterName ? [chapterName] : []))
+        : isSectional 
+          ? (topicFocus ? [topicFocus] : [])
+          : formattedSections.filter(s => s.accuracy < 75).map(s => `${s.sectionName} Accuracy`),
       analysisNotes
     };
 
@@ -341,6 +367,15 @@ export const AddEditMockModal: React.FC = () => {
     }
   };
 
+  const handleSaveInlineChapter = () => {
+    if (newChapterInput.trim()) {
+      const created = addCustomChapter(subjectName, newChapterInput.trim());
+      setChapterName(created.chapterName);
+      setIsAddingNewChapter(false);
+      setNewChapterInput('');
+    }
+  };
+
   return (
     <Modal
       isOpen={isAddModalOpen}
@@ -359,36 +394,49 @@ export const AddEditMockModal: React.FC = () => {
       <form onSubmit={handleSave} className="space-y-6">
         
         {/* 1. Primary Mock Type Switcher */}
-        <div className="grid grid-cols-2 p-1 rounded-2xl bg-slate-100 dark:bg-darkContainer/70 border border-slate-200 dark:border-white/10">
+        <div className="grid grid-cols-3 p-1 rounded-2xl bg-slate-100 dark:bg-darkContainer/70 border border-slate-200 dark:border-white/10 gap-1">
           <button
             type="button"
             onClick={() => handleMockTypeSwitch('FULL_LENGTH')}
-            className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all ${
-              !isSectional
+            className={`py-2 px-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 transition-all ${
+              !isSingleMode
                 ? 'bg-electric-blue text-darkBg shadow-glow-blue'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Target className="w-4 h-4" />
-            <span>Full Length Mock (100 Qs)</span>
+            <Target className="w-4 h-4 shrink-0" />
+            <span className="truncate">Full Length</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleMockTypeSwitch('SECTIONAL')}
-            className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all ${
+            className={`py-2 px-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 transition-all ${
               isSectional
                 ? 'bg-mint-dark dark:bg-mint text-darkBg shadow-glow-mint'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Zap className="w-4 h-4" />
-            <span>Sectional / Subject Drill (25 Qs)</span>
+            <Zap className="w-4 h-4 shrink-0" />
+            <span className="truncate">Sectional Drill</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleMockTypeSwitch('CHAPTER_WISE')}
+            className={`py-2 px-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 transition-all ${
+              isChapterWise
+                ? 'bg-amber-500 text-darkBg shadow-glow-gold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <FileText className="w-4 h-4 shrink-0" />
+            <span className="truncate">Chapter Test</span>
           </button>
         </div>
 
-        {/* 2. Full Length Tabs (HIDDEN IN SECTIONAL MODE) */}
-        {!isSectional && (
+        {/* 2. Full Length Tabs (HIDDEN IN SINGLE/SECTIONAL/CHAPTER MODE) */}
+        {!isSingleMode && (
           <div className="flex border-b border-slate-200 dark:border-white/10">
             <button
               type="button"
@@ -441,48 +489,178 @@ export const AddEditMockModal: React.FC = () => {
           </div>
         )}
 
-        {/* SECTIONAL MODE: STREAMLINED SINGLE-PAGE FORM */}
-        {isSectional && (
+        {/* SINGLE MODE: SECTIONAL OR CHAPTER-WISE STREAMLINED FORM */}
+        {isSingleMode && (
           <div className="space-y-5 animate-fadeIn">
-            {/* Subject Selection & Topic Focus */}
+            
+            {/* Subject Selection */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                  Subject / Section *
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                  Subject *
                 </label>
                 <select
                   value={subjectName}
                   onChange={(e) => {
                     const val = e.target.value as SectionName;
                     setSubjectName(val);
+                    const subChapters = subjectsWithChapters.find(s => s.name.toLowerCase() === val.toLowerCase())?.chapters || [];
+                    if (subChapters.length > 0) {
+                      setChapterName(subChapters[0].chapterName);
+                    }
                     if (!editingMock) {
-                      setTestName(`${val} Sectional Drill #${Math.floor(Math.random() * 90 + 10)}`);
+                      if (isChapterWise) {
+                        setTestName(`${subChapters[0]?.chapterName || val} Drill #1`);
+                      } else {
+                        setTestName(`${val} Sectional Drill #${Math.floor(Math.random() * 90 + 10)}`);
+                      }
                     }
                   }}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-darkContainer light:bg-slate-50 border border-electric-blue text-sm font-bold text-electric-blue focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-darkContainer border border-emerald-500 text-sm font-bold text-emerald-800 dark:text-emerald-400 focus:outline-none"
                 >
-                  <option value="Quantitative Aptitude">📐 Quantitative Aptitude (Maths)</option>
-                  <option value="General Intelligence & Reasoning">🧠 General Intelligence & Reasoning</option>
-                  <option value="English Comprehension">📖 English Comprehension & Grammar</option>
-                  <option value="General Awareness">🌍 General Awareness (GK / GS / Current Affairs)</option>
-                  <option value="Computer Knowledge">💻 Computer Knowledge Module</option>
+                  {subjectsWithChapters.map(s => (
+                    <option key={s.id} value={s.name}>{s.icon} {s.name}</option>
+                  ))}
                   <option value="Custom">Custom Subject</option>
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                  Topic Focus / Tested Chapters
-                </label>
-                <input
-                  type="text"
-                  value={topicFocus}
-                  onChange={(e) => setTopicFocus(e.target.value)}
-                  placeholder="e.g. Time & Work, Algebra, Syllogism, Vocab..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-darkContainer light:bg-slate-50 border border-white/10 light:border-slate-300 text-sm focus:border-electric-blue outline-none"
-                />
-              </div>
+              {/* If Chapter-wise: Chapter Dropdown + Add Chapter */}
+              {isChapterWise ? (
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      Chapter / Topic *
+                    </label>
+                    {!isAddingNewChapter && (
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingNewChapter(true)}
+                        className="text-[11px] font-bold text-emerald-700 dark:text-mint hover:underline flex items-center gap-0.5"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>+ Custom Chapter</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {isAddingNewChapter ? (
+                    <div className="flex items-center gap-1.5 animate-fadeIn">
+                      <input
+                        type="text"
+                        autoFocus
+                        value={newChapterInput}
+                        onChange={(e) => setNewChapterInput(e.target.value)}
+                        placeholder="Enter chapter name..."
+                        className="flex-1 min-w-0 px-3 py-2 rounded-xl bg-white dark:bg-darkContainer border border-emerald-500 text-xs text-slate-900 dark:text-white focus:outline-none"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleSaveInlineChapter();
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSaveInlineChapter}
+                        className="px-2.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold shadow-glow-blue hover:opacity-90 transition-all shrink-0"
+                      >
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAddingNewChapter(false);
+                          setNewChapterInput('');
+                        }}
+                        className="p-2 rounded-xl bg-slate-200 dark:bg-white/5 hover:bg-slate-300 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 text-xs shrink-0"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <select
+                      value={chapterName}
+                      onChange={(e) => {
+                        if (e.target.value === '__NEW_CUSTOM_CHAPTER__') {
+                          setIsAddingNewChapter(true);
+                        } else {
+                          setChapterName(e.target.value);
+                          if (!editingMock) {
+                            setTestName(`${e.target.value} Drill #${Math.floor(Math.random() * 90 + 10)}`);
+                          }
+                        }
+                      }}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-darkContainer border border-slate-300 dark:border-white/10 text-sm font-bold text-slate-900 dark:text-white focus:border-emerald-500 outline-none"
+                    >
+                      {currentSubjectChapters.map(ch => (
+                        <option key={ch.id} value={ch.chapterName}>📑 {ch.chapterName}</option>
+                      ))}
+                      <option value="__NEW_CUSTOM_CHAPTER__" className="font-bold text-emerald-600 dark:text-mint">
+                        ➕ + Add Custom Chapter...
+                      </option>
+                    </select>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                    Topic Focus (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={topicFocus}
+                    onChange={(e) => setTopicFocus(e.target.value)}
+                    placeholder="e.g. Time & Work, Algebra, Syllogism..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-darkContainer border border-slate-300 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:border-emerald-500 outline-none"
+                  />
+                </div>
+              )}
             </div>
+
+            {/* Chapter-wise: Difficulty Level & Subtopics */}
+            {isChapterWise && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                    Difficulty Level
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {(['Easy', 'Moderate', 'Hard', 'Mixed'] as const).map(diff => (
+                      <button
+                        key={diff}
+                        type="button"
+                        onClick={() => setDifficulty(diff)}
+                        className={`py-2 rounded-xl text-xs font-black transition-all ${
+                          difficulty === diff
+                            ? diff === 'Hard'
+                              ? 'bg-alert-red text-white shadow-glow-alert'
+                              : diff === 'Moderate'
+                                ? 'bg-amber-500 text-darkBg shadow-glow-gold'
+                                : 'bg-emerald-600 text-white shadow-glow-blue'
+                            : 'bg-slate-100 dark:bg-darkContainer text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10'
+                        }`}
+                      >
+                        {diff}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                    Subtopic / Concept Focus
+                  </label>
+                  <input
+                    type="text"
+                    value={topicFocus}
+                    onChange={(e) => setTopicFocus(e.target.value)}
+                    placeholder="e.g. Circle Tangents, Inversion Rules..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-darkContainer border border-slate-300 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:border-emerald-500 outline-none"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Test Title & Platform */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
