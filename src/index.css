@@ -81,3 +81,33 @@
 .transform-style-3d {
   transform-style: preserve-3d;
 }
+
+/* Native Mobile App Touch & Safe-Area Optimizations */
+html, body {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: contain;
+}
+
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+}
+
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top), 0.75rem);
+}
+
+/* Mobile bottom sheet drag indicator */
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: rgba(148, 163, 184, 0.4);
+  margin: 0.5rem auto 1rem auto;
+}
