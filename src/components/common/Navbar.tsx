@@ -40,9 +40,11 @@ export const Navbar: React.FC = () => {
           onClick={() => setActiveView('home')}
           className="flex items-center gap-2 cursor-pointer group shrink-0"
         >
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-amber-400 flex items-center justify-center shadow-glow-blue group-hover:scale-105 transition-transform duration-300 shrink-0">
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-darkBg fill-darkBg" />
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="MockTracker Logo" 
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl object-contain shadow-glow-blue group-hover:scale-105 transition-transform duration-300 shrink-0" 
+          />
           <div>
             <div className="font-black text-xs sm:text-sm tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
               <span>MockTracker</span>
