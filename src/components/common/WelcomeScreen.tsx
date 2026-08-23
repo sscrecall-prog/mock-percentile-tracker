@@ -21,7 +21,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ isOpen, onClose })
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-[#0B0D13]/95 backdrop-blur-2xl transition-all duration-350 overflow-y-auto ${
+      className={`md:hidden fixed inset-0 z-50 flex items-center justify-center p-0 bg-[#0B0D13]/95 backdrop-blur-2xl transition-all duration-350 overflow-y-auto ${
         isClosing ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100 animate-fadeIn'
       }`}
     >
