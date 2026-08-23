@@ -101,12 +101,15 @@ export const TopHeader: React.FC = () => {
             rel="noopener noreferrer"
             title="Launch Syllabus 3D"
             onClick={() => audioFX.playClickSound()}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:text-[#00d2ff] hover:border-[#00d2ff]/30 transition-colors text-xs font-bold shrink-0"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:text-[#00d2ff] hover:border-[#00d2ff]/30 transition-colors text-xs font-bold shrink-0 group"
           >
-            <span className="w-4 h-4 rounded-md bg-gradient-to-tr from-[#00d2ff] to-[#8b5cf6] flex items-center justify-center text-white text-[9px] font-black">
-              S
-            </span>
-            <ExternalLink className="w-3 h-3 text-slate-400" />
+            <img 
+              src="/syllabus-logo.png" 
+              alt="Syllabus 3D" 
+              className="w-4 h-4 rounded-md object-contain shrink-0 group-hover:scale-110 transition-transform" 
+            />
+            <span className="hidden sm:inline">Syllabus 3D</span>
+            <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-[#00d2ff]" />
           </a>
 
           {/* Streak Badge */}

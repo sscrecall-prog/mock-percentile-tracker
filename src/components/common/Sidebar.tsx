@@ -50,7 +50,7 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="hidden md:flex flex-col w-64 shrink-0 h-screen sticky top-0 bg-white/95 dark:bg-[#0c1228]/95 backdrop-blur-2xl border-r border-slate-200/80 dark:border-slate-800/80 z-30 overflow-y-auto no-scrollbar justify-between p-4 space-y-4">
+    <aside className="hidden md:flex flex-col w-64 shrink-0 h-screen fixed left-0 top-0 bottom-0 bg-white/95 dark:bg-[#0c1228]/95 backdrop-blur-2xl border-r border-slate-200/80 dark:border-slate-800/80 z-30 overflow-y-auto no-scrollbar justify-between p-4 space-y-4">
       
       {/* 1. Top Section: Logo & Add Mock CTA */}
       <div className="space-y-4">
@@ -133,9 +133,11 @@ export const Sidebar: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-[#00d2ff] to-[#8b5cf6] flex items-center justify-center text-white text-[10px] font-black shadow-sm">
-                S
-              </div>
+              <img 
+                src="/syllabus-logo.png" 
+                alt="Syllabus 3D Logo" 
+                className="w-6 h-6 rounded-lg object-contain shadow-sm shrink-0 group-hover:scale-105 transition-transform" 
+              />
               <div>
                 <div className="text-[11px] font-black text-slate-900 dark:text-white group-hover:text-[#00d2ff] transition-colors flex items-center gap-1">
                   <span>Syllabus 3D</span>

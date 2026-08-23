@@ -28,8 +28,8 @@ const AppContent: React.FC = () => {
       {/* 1. Left Fixed Sidebar (Desktop >= md) */}
       <Sidebar />
 
-      {/* 2. Main Viewport & Scrollable Content Column */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+      {/* 2. Main Viewport & Scrollable Content Column (Offset with md:ml-64 for fixed sidebar) */}
+      <div className="md:ml-64 flex-1 flex flex-col min-w-0 min-h-screen">
         {/* Sticky Top Header */}
         <TopHeader />
 
