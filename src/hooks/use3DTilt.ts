@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, MouseEvent } from 'react';
+import { useRef, useState, useCallback, MouseEvent, useEffect } from 'react';
 
 interface TiltState {
   rotateX: number;
@@ -10,6 +10,7 @@ interface TiltState {
 
 export function use3DTilt(maxTilt: number = 8, perspective: number = 1000) {
   const ref = useRef<HTMLDivElement>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [tilt, setTilt] = useState<TiltState>({
     rotateX: 0,
     rotateY: 0,
@@ -18,8 +19,23 @@ export function use3DTilt(maxTilt: number = 8, perspective: number = 1000) {
     isHovered: false
   });
 
+  useEffect(() => {
+    // Check if device is touch-based (no fine hover pointer)
+    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+    setIsTouchDevice(!mediaQuery.matches);
+
+    const handler = (e: MediaQueryListEvent) => {
+      setIsTouchDevice(!e.matches);
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handler);
+      return () => mediaQuery.removeEventListener('change', handler);
+    }
+  }, []);
+
   const onMouseMove = useCallback((e: MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
+    if (isTouchDevice || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -41,32 +57,36 @@ export function use3DTilt(maxTilt: number = 8, perspective: number = 1000) {
       glowY: percentY,
       isHovered: true
     });
-  }, [maxTilt]);
+  }, [maxTilt, isTouchDevice]);
 
   const onMouseEnter = useCallback(() => {
-    setTilt(prev => ({ ...prev, isHovered: true }));
-  }, []);
+    if (!isTouchDevice) {
+      setTilt(prev => ({ ...prev, isHovered: true }));
+    }
+  }, [isTouchDevice]);
 
   const onMouseLeave = useCallback(() => {
-    setTilt({
-      rotateX: 0,
-      rotateY: 0,
-      glowX: 50,
-      glowY: 50,
-      isHovered: false
-    });
-  }, []);
+    if (!isTouchDevice) {
+      setTilt({
+        rotateX: 0,
+        rotateY: 0,
+        glowX: 50,
+        glowY: 50,
+        isHovered: false
+      });
+    }
+  }, [isTouchDevice]);
 
-  const transformStyle = {
+  const transformStyle = isTouchDevice ? undefined : {
     transform: tilt.isHovered 
       ? `perspective(${perspective}px) rotateX(${tilt.rotateX.toFixed(2)}deg) rotateY(${tilt.rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`
       : `perspective(${perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`,
     transition: tilt.isHovered ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out'
   };
 
-  const glowStyle = {
+  const glowStyle = isTouchDevice ? undefined : {
     background: tilt.isHovered 
-      ? `radial-gradient(circle at ${tilt.glowX}% ${tilt.glowY}%, rgba(110, 194, 253, 0.12), transparent 70%)`
+      ? `radial-gradient(circle at ${tilt.glowX}% ${tilt.glowY}%, rgba(16, 185, 129, 0.15), transparent 70%)`
       : 'transparent',
     transition: 'background 0.2s ease-out'
   };

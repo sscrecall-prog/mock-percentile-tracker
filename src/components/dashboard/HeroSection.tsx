@@ -110,7 +110,7 @@ export const HeroSection: React.FC = () => {
         </div>
 
         {/* Right Column: 3D Holographic Scene */}
-        <div className="lg:col-span-5 relative w-full h-[260px] sm:h-[300px] flex items-center justify-center">
+        <div className="lg:col-span-5 relative w-full h-[260px] sm:h-[300px] flex items-center justify-center pointer-events-none">
           <Hero3DCanvas />
         </div>
 

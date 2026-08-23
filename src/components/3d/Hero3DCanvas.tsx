@@ -96,13 +96,15 @@ export const Hero3DCanvas: React.FC = () => {
     mintLight.position.set(-2, -2, 2);
     scene.add(mintLight);
 
-    // Mouse Interaction
+    // Mouse Interaction (Desktop Fine Pointer Only)
     let mouseX = 0;
     let mouseY = 0;
     let targetX = 0;
     let targetY = 0;
+    const isDesktopPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (!isDesktopPointer) return;
       const rect = container.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
@@ -110,7 +112,9 @@ export const Hero3DCanvas: React.FC = () => {
       targetY = y * 0.8;
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    if (isDesktopPointer) {
+      window.addEventListener('mousemove', handleMouseMove);
+    }
 
     // Resize Handler
     const handleResize = () => {
@@ -131,9 +135,11 @@ export const Hero3DCanvas: React.FC = () => {
     const animate = () => {
       const elapsedTime = clock.getElapsedTime();
 
-      // Smooth mouse interpolation
-      mouseX += (targetX - mouseX) * 0.05;
-      mouseY += (targetY - mouseY) * 0.05;
+      // Smooth mouse interpolation on desktop
+      if (isDesktopPointer) {
+        mouseX += (targetX - mouseX) * 0.05;
+        mouseY += (targetY - mouseY) * 0.05;
+      }
 
       mainRing.rotation.x = 0.5 + mouseY + Math.sin(elapsedTime * 0.5) * 0.15;
       mainRing.rotation.y = elapsedTime * 0.35 + mouseX;
@@ -159,7 +165,9 @@ export const Hero3DCanvas: React.FC = () => {
     animate();
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      if (isDesktopPointer) {
+        window.removeEventListener('mousemove', handleMouseMove);
+      }
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
       if (renderer.domElement && container.contains(renderer.domElement)) {

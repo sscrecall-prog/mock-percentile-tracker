@@ -84,11 +84,24 @@
 
 /* Native Mobile App Touch & Safe-Area Optimizations */
 html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-  overscroll-behavior-y: contain;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
 }
 
 button, a, input, select, textarea {
