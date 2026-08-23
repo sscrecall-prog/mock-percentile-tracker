@@ -19,6 +19,10 @@ export const SectionalDashboard: React.FC<SectionalDashboardProps> = ({
   const isAll = selectedSubject === 'ALL';
 
   const totalDrills = activeMocks.length;
+  const avgScore = totalDrills > 0
+    ? Number((activeMocks.reduce((sum, m) => sum + m.score, 0) / totalDrills).toFixed(1))
+    : 0;
+
   const avgAccuracy = totalDrills > 0
     ? Number((activeMocks.reduce((sum, m) => sum + m.accuracy, 0) / totalDrills).toFixed(1))
     : 0;
@@ -159,21 +163,29 @@ export const SectionalDashboard: React.FC<SectionalDashboardProps> = ({
         </div>
       </div>
 
-      {/* 6 Sectional Metric Cards (Filtered dynamically by active subject!) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* 7 Sectional Metric Cards (Filtered dynamically by active subject!) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
         <StatCard
           title={isAll ? 'Sectional Drills' : `${subjectShortTitle} Drills`}
           value={totalDrills}
-          subtitle={isAll ? 'Total single subject tests' : `${subjectShortTitle} test sessions`}
-          icon={<Zap className="w-4 h-4" />}
+          subtitle={isAll ? 'Total single tests' : `${subjectShortTitle} sessions`}
+          icon={<Zap className="w-4 h-4 text-emerald-600 dark:text-mint" />}
           accentColor="#BEFFCC"
+        />
+
+        <StatCard
+          title="Avg Score"
+          value={avgScore > 0 ? `${avgScore}` : '0'}
+          subtitle="Average score / 50"
+          icon={<Target className="w-4 h-4 text-sky-600 dark:text-electric-blue" />}
+          accentColor="#38BDF8"
         />
 
         <StatCard
           title="Avg Accuracy"
           value={avgAccuracy > 0 ? `${avgAccuracy}%` : '0%'}
           subtitle={`${subjectShortTitle} accuracy`}
-          icon={<CheckCircle2 className="w-4 h-4" />}
+          icon={<CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-mint" />}
           accentColor="#5EE88A"
           trend={avgAccuracy >= 88 ? { value: 'Target', isPositive: true } : undefined}
         />
@@ -182,7 +194,7 @@ export const SectionalDashboard: React.FC<SectionalDashboardProps> = ({
           title="Avg Speed / Pace"
           value={`${avgSecondsPerQuestion}s`}
           subtitle="Seconds per question"
-          icon={<Clock className="w-4 h-4" />}
+          icon={<Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />}
           accentColor="#6EC2FD"
         />
 
@@ -190,15 +202,15 @@ export const SectionalDashboard: React.FC<SectionalDashboardProps> = ({
           title="Peak Score"
           value={bestScore > 0 ? `${bestScore}` : '0'}
           subtitle="Best drill score / 50"
-          icon={<Award className="w-4 h-4" />}
-          accentColor="#38BDF8"
+          icon={<Award className="w-4 h-4 text-purple-600 dark:text-lavender" />}
+          accentColor="#A78BFA"
         />
 
         <StatCard
           title="Total Questions"
           value={totalQuestions}
-          subtitle="Total questions attempted"
-          icon={<Layers className="w-4 h-4" />}
+          subtitle="Total questions in drills"
+          icon={<Layers className="w-4 h-4 text-slate-600 dark:text-slate-400" />}
           accentColor="#A78BFA"
         />
 
@@ -206,7 +218,7 @@ export const SectionalDashboard: React.FC<SectionalDashboardProps> = ({
           title="Cutoff Rate"
           value={`${cutoffRate}%`}
           subtitle="Benchmark clear rate"
-          icon={<Flame className="w-4 h-4" />}
+          icon={<Flame className="w-4 h-4 text-alert-red" />}
           accentColor="#F472B6"
         />
       </div>
