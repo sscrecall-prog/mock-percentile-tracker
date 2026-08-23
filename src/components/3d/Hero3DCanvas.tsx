@@ -31,8 +31,8 @@ export const Hero3DCanvas: React.FC = () => {
     // 3. Central Holographic Torus (Percentile Ring)
     const ringGeo = new THREE.TorusGeometry(1.3, 0.14, 24, 80);
     const ringMat = new THREE.MeshStandardMaterial({
-      color: activeTheme === 'dark' ? 0x6ec2fd : 0x0284c7,
-      emissive: activeTheme === 'dark' ? 0x143048 : 0x0369a1,
+      color: activeTheme === 'dark' ? 0x10b981 : 0x059669,
+      emissive: activeTheme === 'dark' ? 0x064e3b : 0x047857,
       roughness: 0.2,
       metalness: 0.8,
       wireframe: false,
@@ -40,22 +40,22 @@ export const Hero3DCanvas: React.FC = () => {
     const mainRing = new THREE.Mesh(ringGeo, ringMat);
     scene.add(mainRing);
 
-    // 4. Secondary Orbital Lattice Ring
+    // 4. Secondary Orbital Lattice Ring (Golden Orbit)
     const latticeGeo = new THREE.TorusGeometry(1.65, 0.04, 16, 60);
     const latticeMat = new THREE.MeshBasicMaterial({
-      color: activeTheme === 'dark' ? 0xbeffcc : 0x059669,
+      color: activeTheme === 'dark' ? 0xf59e0b : 0xd97706,
       wireframe: true,
       transparent: true,
-      opacity: 0.6
+      opacity: 0.7
     });
     const latticeRing = new THREE.Mesh(latticeGeo, latticeMat);
     scene.add(latticeRing);
 
-    // 5. Orbiting Data Nodes
+    // 5. Orbiting Data Nodes (Gold & Mint Crystals)
     const nodeGeo = new THREE.IcosahedronGeometry(0.12, 1);
     const nodeMat = new THREE.MeshStandardMaterial({
-      color: 0xa78bfa,
-      emissive: 0x5b21b6,
+      color: 0xf59e0b,
+      emissive: 0x78350f,
       roughness: 0.1,
       metalness: 0.9
     });

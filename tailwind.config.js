@@ -8,17 +8,37 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Emerald Focus & Gold Brand Palette
         electric: {
-          blue: '#6EC2FD',
-          dark: '#389DF2',
-          glow: 'rgba(110, 194, 253, 0.25)',
-          light: '#E0F4FF',
+          blue: '#10B981', // Vivid Emerald Focus
+          dark: '#059669',
+          glow: 'rgba(16, 185, 129, 0.35)',
+          light: '#ECFDF5',
+        },
+        emerald: {
+          DEFAULT: '#10B981',
+          50: '#ECFDF5',
+          100: '#D1FAE5',
+          200: '#A7F3D0',
+          300: '#6EE7B7',
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065F46',
+          900: '#064E3B',
+        },
+        gold: {
+          DEFAULT: '#F59E0B',
+          light: '#FEF3C7',
+          dark: '#D97706',
+          glow: 'rgba(245, 158, 11, 0.35)',
         },
         mint: {
-          DEFAULT: '#BEFFCC',
-          dark: '#5EE88A',
-          emerald: '#34D399',
-          glow: 'rgba(190, 255, 204, 0.25)',
+          DEFAULT: '#34D399',
+          dark: '#10B981',
+          emerald: '#059669',
+          glow: 'rgba(52, 211, 153, 0.35)',
         },
         alert: {
           red: '#EF4648',
@@ -30,7 +50,7 @@ export default {
         sky: '#38BDF8',
         orangeAccent: '#FB923C',
         amberAccent: '#F59E0B',
-        // Dark theme surfaces
+        // Dark theme surfaces (Preserved exact deep dark palette)
         darkBg: '#15171D',
         darkSurface: '#1B1E26',
         darkElevated: '#222733',
@@ -54,8 +74,9 @@ export default {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       boxShadow: {
-        'glow-blue': '0 0 25px -5px rgba(110, 194, 253, 0.35)',
-        'glow-mint': '0 0 25px -5px rgba(190, 255, 204, 0.35)',
+        'glow-blue': '0 0 25px -5px rgba(16, 185, 129, 0.45)', // Emerald primary glow
+        'glow-mint': '0 0 25px -5px rgba(52, 211, 153, 0.45)',
+        'glow-gold': '0 0 25px -5px rgba(245, 158, 11, 0.45)', // Gold accent glow
         'glow-alert': '0 0 25px -5px rgba(239, 70, 72, 0.35)',
         '3d-dark': '0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06)',
         '3d-light': '0 10px 30px -10px rgba(15, 23, 42, 0.1), 0 0 0 1px rgba(15, 23, 42, 0.05)',

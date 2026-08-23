@@ -1,9 +1,13 @@
 export const THEME_COLORS = {
-  electricBlue: '#6EC2FD',
-  electricBlueDark: '#389DF2',
-  electricCyanLight: '#E0F4FF',
-  softMint: '#BEFFCC',
-  softMintDark: '#5EE88A',
+  // Emerald Focus & Gold Palette
+  electricBlue: '#10B981', // Emerald Core
+  electricBlueDark: '#059669',
+  electricCyanLight: '#ECFDF5',
+  softMint: '#34D399',
+  softMintDark: '#059669',
+  gold: '#F59E0B',
+  goldDark: '#D97706',
+  goldLight: '#FEF3C7',
   alertRed: '#EF4648',
   alertRedDark: '#D42D30',
   warningOrange: '#F97316',
@@ -11,15 +15,15 @@ export const THEME_COLORS = {
   lavender: '#A78BFA',
   pink: '#F472B6',
   sky: '#38BDF8',
-  emerald: '#34D399',
+  emerald: '#10B981',
   
   // Subject spectrum mapping
   subjects: {
-    'Quantitative Aptitude': '#38BDF8',
-    'General Intelligence & Reasoning': '#F472B6',
-    'English Comprehension': '#A78BFA',
-    'General Awareness': '#6EC2FD',
-    'Computer Knowledge': '#34D399',
-    'Custom': '#FB923C',
+    'Quantitative Aptitude': '#10B981', // Emerald
+    'General Intelligence & Reasoning': '#F59E0B', // Gold
+    'English Comprehension': '#A78BFA', // Purple/Lavender
+    'General Awareness': '#38BDF8', // Sky
+    'Computer Knowledge': '#34D399', // Mint
+    'Custom': '#FB923C', // Orange
   }
 };
