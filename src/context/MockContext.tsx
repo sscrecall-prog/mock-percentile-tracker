@@ -5,7 +5,8 @@ import {
   SectionPerformance, 
   SubjectDefinition, 
   ChapterDefinition, 
-  ChapterMasterySummary 
+  ChapterMasterySummary,
+  AspirantGamification
 } from '../types/mock';
 import { OverallKPIs, SubjectStat, WeakSectionDiagnosis, PerformanceInsight } from '../types/analytics';
 import { UserSettings } from '../types/settings';
@@ -13,6 +14,8 @@ import { MockRepository } from '../data/mockRepository';
 import { StorageService, DEFAULT_PLATFORMS, DEFAULT_SUBJECTS_AND_CHAPTERS } from '../data/storage';
 import { calculateOverallKPIs, calculateSubjectStats } from '../engine/analyticsEngine';
 import { diagnoseWeakSections, generatePerformanceInsights } from '../engine/feedbackEngine';
+import { audioFX } from '../utils/audioFX';
+import { triggerCelebrationConfetti } from '../utils/confettiFX';
 
 export type NavView = 'home' | 'mocks' | 'full-length' | 'sectional' | 'chapter-wise' | 'analytics' | 'percentile' | 'settings';
 
@@ -49,6 +52,11 @@ interface MockContextType {
   settings: UserSettings;
   updateSettings: (newSettings: Partial<UserSettings>) => void;
   
+  // Gamification & Audio
+  gamification: AspirantGamification;
+  isSoundEnabled: boolean;
+  toggleSound: () => void;
+
   // Chapter & Subject Management
   subjectsWithChapters: SubjectDefinition[];
   addCustomChapter: (subjectName: string, chapterName: string, subtopics?: string[], targetAccuracy?: number) => ChapterDefinition;
@@ -124,6 +132,7 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [activeView, setActiveView] = useState<NavView>('home');
   const [filters, setFilters] = useState<MockFilters>(defaultFilters);
   const [selectedMockIds, setSelectedMockIds] = useState<string[]>([]);
+  const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(() => audioFX.getSoundEnabled());
   
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
@@ -146,6 +155,16 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
+
+  const toggleSound = useCallback(() => {
+    setIsSoundEnabled(prev => {
+      const next = !prev;
+      audioFX.setSoundEnabled(next);
+      if (next) audioFX.playClickSound();
+      showToast(next ? 'Sound FX Enabled 🔊' : 'Sound FX Muted 🔇', 'info');
+      return next;
+    });
+  }, [showToast]);
 
   const updateSettings = useCallback((newSettings: Partial<UserSettings>) => {
     setSettings(prev => {
@@ -414,11 +433,49 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const weakSections = useMemo(() => diagnoseWeakSections(mocks), [mocks]);
   const insights = useMemo(() => generatePerformanceInsights(mocks), [mocks]);
 
+  // Gamification Engine (XP, Level, Streak)
+  const gamification = useMemo<AspirantGamification>(() => {
+    const testPoints = mocks.length * 100;
+    const cutoffPoints = mocks.filter(m => m.isClearedCutoff).length * 75;
+    const chapterPoints = overallChapterMastery.mastered * 150;
+    const totalXp = testPoints + cutoffPoints + chapterPoints;
+
+    const level = Math.max(1, Math.floor(totalXp / 500) + 1);
+    const nextLevelXp = level * 500;
+    const progressPercent = Math.min(100, Math.round(((totalXp % 500) / 500) * 100));
+
+    let levelTitle = 'Novice Cadet';
+    if (level === 2) levelTitle = 'Exam Contender';
+    else if (level === 3) levelTitle = 'Mock Veteran';
+    else if (level === 4) levelTitle = 'Cutoff Crusher';
+    else if (level === 5) levelTitle = 'Percentile Master';
+    else if (level >= 6) levelTitle = 'All India Ranker ⭐';
+
+    // Calculate mock streak
+    const uniqueDates = Array.from(new Set(mocks.map(m => m.date))).sort().reverse();
+    const streakDays = Math.max(1, Math.min(uniqueDates.length, mocks.length));
+
+    return {
+      totalXp,
+      level,
+      levelTitle,
+      nextLevelXp,
+      progressPercent,
+      streakDays
+    };
+  }, [mocks, overallChapterMastery]);
+
   // CRUD
   const addMock = useCallback((mockData: Omit<MockTest, 'id' | 'createdAt'>) => {
     const created = repository.create(mockData);
     setMocks(repository.getAll());
-    showToast(`Mock "${created.testName}" logged successfully!`);
+    if (created.isClearedCutoff || created.accuracy >= 90) {
+      audioFX.playAchievementSound();
+      triggerCelebrationConfetti();
+    } else {
+      audioFX.playSuccessChime();
+    }
+    showToast(`Mock "${created.testName}" logged! +100 XP ⚡`);
     return created;
   }, [showToast]);
 
@@ -426,6 +483,7 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updated = repository.update(id, updates);
     if (updated) {
       setMocks(repository.getAll());
+      audioFX.playSuccessChime();
       showToast(`Mock "${updated.testName}" updated.`);
     }
   }, [showToast]);
@@ -437,6 +495,7 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setMocks(repository.getAll());
     setSelectedMockIds(prev => prev.filter(item => item !== id));
     if (viewingMockDetail?.id === id) setViewingMockDetail(null);
+    audioFX.playClickSound();
     showToast(`Deleted "${name}".`, 'info');
   }, [showToast, viewingMockDetail]);
 
@@ -444,12 +503,14 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const copy = repository.duplicate(id);
     if (copy) {
       setMocks(repository.getAll());
+      audioFX.playSuccessChime();
       showToast(`Duplicated "${copy.testName}".`);
     }
   }, [showToast]);
 
   const toggleMockSelection = useCallback((id: string) => {
     setSelectedMockIds(prev => {
+      audioFX.playClickSound();
       if (prev.includes(id)) {
         return prev.filter(item => item !== id);
       } else {
@@ -472,6 +533,7 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSelectedMockIds([]);
     setSubjectsWithChapters(DEFAULT_SUBJECTS_AND_CHAPTERS);
     StorageService.saveSubjectsWithChapters(DEFAULT_SUBJECTS_AND_CHAPTERS);
+    audioFX.playSuccessChime();
     showToast('Reset to default sample mocks & syllabus.', 'info');
   }, [showToast]);
 
@@ -479,7 +541,8 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
     repository.clearAll();
     setMocks([]);
     setSelectedMockIds([]);
-    showToast('All mock tests deleted.', 'warning');
+    audioFX.playClickSound();
+    showToast('All mock tests cleared. Started fresh blank database.', 'warning');
   }, [showToast]);
 
   const exportJSON = useCallback(() => {
@@ -532,6 +595,9 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSelectedMockIds,
         settings,
         updateSettings,
+        gamification,
+        isSoundEnabled,
+        toggleSound,
         subjectsWithChapters,
         addCustomChapter,
         deleteCustomChapter,

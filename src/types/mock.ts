@@ -114,3 +114,13 @@ export interface MockFilters {
   sortBy: 'date' | 'score' | 'percentile' | 'accuracy' | 'time';
   sortOrder: 'asc' | 'desc';
 }
+
+export interface AspirantGamification {
+  totalXp: number;
+  level: number;
+  levelTitle: string;
+  nextLevelXp: number;
+  progressPercent: number;
+  streakDays: number;
+}
+

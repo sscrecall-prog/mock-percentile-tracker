@@ -8,62 +8,71 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Emerald Focus & Gold Brand Palette
-        electric: {
-          blue: '#10B981', // Vivid Emerald Focus
-          dark: '#059669',
-          glow: 'rgba(16, 185, 129, 0.35)',
-          light: '#ECFDF5',
+        // Neon Cyber Glass 3D Signature Accents
+        neon: {
+          cyan: '#00D2FF',
+          blue: '#3B82F6',
+          purple: '#8B5CF6',
+          violet: '#A855F7',
+          magenta: '#EC4899',
+          pink: '#D946EF',
+          emerald: '#10B981',
+          mint: '#34D399',
+          amber: '#F59E0B',
+          gold: '#FBBF24',
+          crimson: '#F43F5E',
+          red: '#EF4444',
         },
-        emerald: {
-          DEFAULT: '#10B981',
-          50: '#ECFDF5',
-          100: '#D1FAE5',
-          200: '#A7F3D0',
-          300: '#6EE7B7',
-          400: '#34D399',
-          500: '#10B981',
-          600: '#059669',
-          700: '#047857',
-          800: '#065F46',
-          900: '#064E3B',
+        electric: {
+          blue: '#00D2FF', // Electric Cyan Primary
+          dark: '#0066FF',
+          glow: 'rgba(0, 210, 255, 0.45)',
+          light: '#E0F7FF',
+        },
+        cyber: {
+          purple: '#8B5CF6',
+          magenta: '#EC4899',
+          pink: '#D946EF',
         },
         gold: {
           DEFAULT: '#F59E0B',
           light: '#FEF3C7',
           dark: '#D97706',
-          glow: 'rgba(245, 158, 11, 0.35)',
+          glow: 'rgba(245, 158, 11, 0.45)',
         },
         mint: {
           DEFAULT: '#34D399',
           dark: '#10B981',
           emerald: '#059669',
-          glow: 'rgba(52, 211, 153, 0.35)',
+          glow: 'rgba(52, 211, 153, 0.45)',
         },
         alert: {
-          red: '#EF4648',
-          dark: '#D42D30',
-          glow: 'rgba(239, 70, 72, 0.25)',
+          red: '#F43F5E',
+          dark: '#E11D48',
+          glow: 'rgba(244, 63, 94, 0.35)',
         },
-        lavender: '#A78BFA',
-        pinkAccent: '#F472B6',
-        sky: '#38BDF8',
+        lavender: '#A855F7',
+        pinkAccent: '#EC4899',
+        sky: '#00D2FF',
         orangeAccent: '#FB923C',
         amberAccent: '#F59E0B',
-        // Dark theme surfaces (Preserved exact deep dark palette)
-        darkBg: '#15171D',
-        darkSurface: '#1B1E26',
-        darkElevated: '#222733',
-        darkContainer: '#1F2430',
-        darkCard: '#191D26',
-        darkBorder: 'rgba(255, 255, 255, 0.08)',
-        // Light theme surfaces
-        lightBg: '#F4F7FB',
+
+        // Deep Space & Cyber Glass Surfaces (Dark Mode Default)
+        darkBg: '#050814',
+        darkSurface: '#0C1228',
+        darkElevated: '#131B38',
+        darkContainer: '#0E1630',
+        darkCard: '#0C1228',
+        darkBorder: 'rgba(255, 255, 255, 0.09)',
+
+        // Light mode surfaces (Crisp porcelain)
+        lightBg: '#F8FAFC',
         lightSurface: '#FFFFFF',
-        lightContainer: '#E8EEF5',
+        lightContainer: '#F1F5F9',
         lightCard: '#FFFFFF',
         lightBorder: 'rgba(15, 23, 42, 0.08)',
-        // Warm Cream theme surfaces
+
+        // Warm Cream mode surfaces
         warmBg: '#F7F4EE',
         warmSurface: '#FFFDF9',
         warmContainer: '#ECE5D8',
@@ -74,22 +83,32 @@ export default {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       boxShadow: {
-        'glow-blue': '0 0 25px -5px rgba(16, 185, 129, 0.45)', // Emerald primary glow
-        'glow-mint': '0 0 25px -5px rgba(52, 211, 153, 0.45)',
-        'glow-gold': '0 0 25px -5px rgba(245, 158, 11, 0.45)', // Gold accent glow
-        'glow-alert': '0 0 25px -5px rgba(239, 70, 72, 0.35)',
-        '3d-dark': '0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06)',
+        'glow-blue': '0 0 25px -3px rgba(0, 210, 255, 0.45)',
+        'glow-cyan': '0 0 30px -3px rgba(0, 210, 255, 0.55)',
+        'glow-purple': '0 0 30px -3px rgba(139, 92, 246, 0.55)',
+        'glow-magenta': '0 0 30px -3px rgba(236, 72, 153, 0.55)',
+        'glow-mint': '0 0 25px -3px rgba(16, 185, 129, 0.45)',
+        'glow-gold': '0 0 25px -3px rgba(245, 158, 11, 0.45)',
+        'glow-alert': '0 0 25px -3px rgba(244, 63, 94, 0.45)',
+        'cyber-glass': '0 12px 40px 0 rgba(0, 0, 0, 0.6), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1)',
+        'cyber-cta': '0 0 25px rgba(139, 92, 246, 0.45), 0 0 50px rgba(217, 70, 239, 0.25)',
+        '3d-dark': '0 15px 35px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08)',
         '3d-light': '0 10px 30px -10px rgba(15, 23, 42, 0.1), 0 0 0 1px rgba(15, 23, 42, 0.05)',
       },
       animation: {
         'float': 'float 4s ease-in-out infinite',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'spin-slow': 'spin 12s linear infinite',
+        'glow-pulse': 'glowPulse 3s ease-in-out infinite',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-6px)' },
+        },
+        glowPulse: {
+          '0%, 100%': { opacity: '0.6' },
+          '50%': { opacity: '1' },
         }
       }
     },

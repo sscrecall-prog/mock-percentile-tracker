@@ -28,44 +28,50 @@ export const Hero3DCanvas: React.FC = () => {
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     container.appendChild(renderer.domElement);
 
-    // 3. Central Holographic Torus (Percentile Ring)
+    // 3. Central Holographic Torus (Electric Cyan / Cyber Purple Ring)
     const ringGeo = new THREE.TorusGeometry(1.3, 0.14, 24, 80);
     const ringMat = new THREE.MeshStandardMaterial({
-      color: activeTheme === 'dark' ? 0x10b981 : 0x059669,
-      emissive: activeTheme === 'dark' ? 0x064e3b : 0x047857,
-      roughness: 0.2,
-      metalness: 0.8,
+      color: activeTheme === 'dark' ? 0x00d2ff : 0x0088ff,
+      emissive: activeTheme === 'dark' ? 0x003366 : 0x004488,
+      roughness: 0.15,
+      metalness: 0.85,
       wireframe: false,
     });
     const mainRing = new THREE.Mesh(ringGeo, ringMat);
     scene.add(mainRing);
 
-    // 4. Secondary Orbital Lattice Ring (Golden Orbit)
+    // 4. Secondary Orbital Lattice Ring (Cyber Purple Orbit)
     const latticeGeo = new THREE.TorusGeometry(1.65, 0.04, 16, 60);
     const latticeMat = new THREE.MeshBasicMaterial({
-      color: activeTheme === 'dark' ? 0xf59e0b : 0xd97706,
+      color: activeTheme === 'dark' ? 0x8b5cf6 : 0x7c3aed,
       wireframe: true,
       transparent: true,
-      opacity: 0.7
+      opacity: 0.75
     });
     const latticeRing = new THREE.Mesh(latticeGeo, latticeMat);
     scene.add(latticeRing);
 
-    // 5. Orbiting Data Nodes (Gold & Mint Crystals)
+    // 5. Orbiting Data Nodes (Vivid Magenta & Amber Crystals)
     const nodeGeo = new THREE.IcosahedronGeometry(0.12, 1);
-    const nodeMat = new THREE.MeshStandardMaterial({
-      color: 0xf59e0b,
-      emissive: 0x78350f,
+    const nodeMat1 = new THREE.MeshStandardMaterial({
+      color: 0xec4899,
+      emissive: 0x831843,
       roughness: 0.1,
       metalness: 0.9
     });
-    const node1 = new THREE.Mesh(nodeGeo, nodeMat);
-    const node2 = new THREE.Mesh(nodeGeo, nodeMat);
+    const nodeMat2 = new THREE.MeshStandardMaterial({
+      color: 0x00d2ff,
+      emissive: 0x0369a1,
+      roughness: 0.1,
+      metalness: 0.9
+    });
+    const node1 = new THREE.Mesh(nodeGeo, nodeMat1);
+    const node2 = new THREE.Mesh(nodeGeo, nodeMat2);
     scene.add(node1);
     scene.add(node2);
 
-    // 6. Particle Constellation
-    const particleCount = 120;
+    // 6. Particle Constellation (Cyan & Magenta Stardust)
+    const particleCount = 130;
     const posArray = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount * 3; i += 3) {
       posArray[i] = (Math.random() - 0.5) * 6;
@@ -76,7 +82,7 @@ export const Hero3DCanvas: React.FC = () => {
     particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
     const particlesMat = new THREE.PointsMaterial({
       size: 0.04,
-      color: activeTheme === 'dark' ? 0x6ec2fd : 0x389df2,
+      color: activeTheme === 'dark' ? 0x00d2ff : 0x2563eb,
       transparent: true,
       opacity: 0.75,
       blending: THREE.AdditiveBlending
