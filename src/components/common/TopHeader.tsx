@@ -9,7 +9,8 @@ import {
   VolumeX, 
   ExternalLink,
   Plus,
-  Target
+  Target,
+  ArrowLeft
 } from 'lucide-react';
 import { useMocks } from '../../context/MockContext';
 import { useTheme } from '../../theme/ThemeContext';
@@ -24,7 +25,10 @@ export const TopHeader: React.FC = () => {
     isSoundEnabled, 
     toggleSound,
     settings,
-    setActiveView
+    setActiveView,
+    activeView,
+    navigateBack,
+    canNavigateBack
   } = useMocks();
   const { theme, setTheme, activeTheme } = useTheme();
 
@@ -37,38 +41,53 @@ export const TopHeader: React.FC = () => {
     <header className="sticky top-0 z-30 w-full backdrop-blur-xl border-b transition-colors duration-300 bg-white/90 dark:bg-[#0c1228]/85 warm-cream:bg-warmBg/90 border-slate-200/80 dark:border-slate-800/80 shadow-sm">
       <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
         
-        {/* Mobile Header Brand Logo (Visible on mobile screens < md) */}
-        <div 
-          onClick={() => {
-            audioFX.playClickSound();
-            setActiveView('home');
-          }}
-          className="flex md:hidden items-center gap-1.5 cursor-pointer group shrink-0"
-        >
-          <img 
-            src="/logo.png" 
-            alt="MockTracker Logo" 
-            className="w-7 h-7 rounded-xl object-contain shadow-glow-cyan shrink-0" 
-          />
-          <div className="shrink-0">
-            <div className="font-black text-xs tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
-              <span className="bg-gradient-to-r from-[#00d2ff] via-[#a855f7] to-[#ec4899] bg-clip-text text-transparent">MockTracker</span>
-              <span className="text-[8px] font-black px-1 py-0.2 rounded bg-cyan-500/15 text-cyan-500 dark:text-[#00d2ff] border border-cyan-500/30 uppercase">
-                3D
-              </span>
+        {/* Left Section: Back Button OR Brand Logo on Mobile */}
+        <div className="flex items-center gap-2 shrink-0">
+          {canNavigateBack && (
+            <button
+              type="button"
+              onClick={navigateBack}
+              title="Go Back"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 border border-slate-300 dark:border-white/10 text-xs font-bold text-slate-800 dark:text-white transition-all cursor-pointer select-none active:scale-95 shadow-sm"
+            >
+              <ArrowLeft className="w-4 h-4 text-[#00d2ff]" />
+              <span className="hidden sm:inline">Back</span>
+            </button>
+          )}
+
+          {/* Mobile Header Brand Logo (Visible on mobile screens < md) */}
+          <div 
+            onClick={() => {
+              audioFX.playClickSound();
+              setActiveView('home');
+            }}
+            className="flex md:hidden items-center gap-1.5 cursor-pointer group shrink-0"
+          >
+            <img 
+              src="/logo.png" 
+              alt="MockTracker Logo" 
+              className="w-7 h-7 rounded-xl object-contain shadow-glow-cyan shrink-0" 
+            />
+            <div className="shrink-0">
+              <div className="font-black text-xs tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
+                <span className="bg-gradient-to-r from-[#00d2ff] via-[#a855f7] to-[#ec4899] bg-clip-text text-transparent">MockTracker</span>
+                <span className="text-[8px] font-black px-1 py-0.2 rounded bg-cyan-500/15 text-cyan-500 dark:text-[#00d2ff] border border-cyan-500/30 uppercase">
+                  3D
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Desktop Left: Target Exam & Benchmark Badges (Visible md and above) */}
-        <div className="hidden md:flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-800 dark:text-slate-200">
-            <Target className="w-3.5 h-3.5 text-[#00d2ff]" />
-            <span>Target Exam: {settings.selectedExam || 'SSC CGL'}</span>
-          </div>
+          {/* Desktop Left: Target Exam & Benchmark Badges (Visible md and above) */}
+          <div className="hidden md:flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-800 dark:text-slate-200">
+              <Target className="w-3.5 h-3.5 text-[#00d2ff]" />
+              <span>Target Exam: {settings.selectedExam || 'SSC CGL'}</span>
+            </div>
 
-          <div className="flex items-center gap-1 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-[#8b5cf6]/10 to-[#ec4899]/10 border border-[#8b5cf6]/20 text-[11px] font-extrabold text-[#8b5cf6] dark:text-[#a855f7]">
-            <span>Target: {settings.targetPercentile || 90}%ile</span>
+            <div className="flex items-center gap-1 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-[#8b5cf6]/10 to-[#ec4899]/10 border border-[#8b5cf6]/20 text-[11px] font-extrabold text-[#8b5cf6] dark:text-[#a855f7]">
+              <span>Target: {settings.targetPercentile || 90}%ile</span>
+            </div>
           </div>
         </div>
 

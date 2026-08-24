@@ -47,6 +47,8 @@ interface MockContextType {
   chapterMocks: MockTest[];
   activeView: NavView;
   setActiveView: (view: NavView) => void;
+  navigateBack: () => void;
+  canNavigateBack: boolean;
   filters: MockFilters;
   setFilters: React.Dispatch<React.SetStateAction<MockFilters>>;
   filteredMocks: MockTest[];
@@ -133,7 +135,51 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [settings, setSettings] = useState<UserSettings>(() => StorageService.loadSettings());
   const [customPlatforms, setCustomPlatforms] = useState<string[]>(() => StorageService.loadCustomPlatforms());
   const [subjectsWithChapters, setSubjectsWithChapters] = useState<SubjectDefinition[]>(() => StorageService.loadSubjectsWithChapters());
-  const [activeView, setActiveView] = useState<NavView>('home');
+  const [activeView, setActiveViewRaw] = useState<NavView>('home');
+  const [navHistory, setNavHistory] = useState<NavView[]>(['home']);
+
+  const setActiveView = useCallback((view: NavView) => {
+    setActiveViewRaw((current) => {
+      if (current !== view) {
+        setNavHistory((prev) => [...prev, view]);
+        if (typeof window !== 'undefined') {
+          window.history.pushState({ view }, '', window.location.pathname);
+        }
+      }
+      return view;
+    });
+  }, []);
+
+  const navigateBack = useCallback(() => {
+    audioFX.playClickSound();
+    setNavHistory((prev) => {
+      if (prev.length > 1) {
+        const nextHistory = [...prev];
+        nextHistory.pop(); // remove current view
+        const prevView = nextHistory[nextHistory.length - 1] || 'home';
+        setActiveViewRaw(prevView);
+        return nextHistory;
+      }
+      setActiveViewRaw('home');
+      return ['home'];
+    });
+  }, []);
+
+  const canNavigateBack = activeView !== 'home';
+
+  // Listen to browser & Android hardware back button
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state?.view) {
+        setActiveViewRaw(e.state.view);
+      } else {
+        setActiveViewRaw('home');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const [filters, setFilters] = useState<MockFilters>(defaultFilters);
   const [selectedMockIds, setSelectedMockIds] = useState<string[]>([]);
   const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(() => audioFX.getSoundEnabled());
@@ -704,6 +750,8 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
         chapterMocks,
         activeView,
         setActiveView,
+        navigateBack,
+        canNavigateBack,
         filters,
         setFilters,
         filteredMocks,

@@ -52,11 +52,27 @@ export const LoginView: React.FC = () => {
   const isConfirmPasswordValid = password === confirmPassword && confirmPassword.length > 0;
   const isFullNameValid = fullName.trim().length > 0;
 
-  // Clear errors upon switching tabs
+  // Listen to browser & Android hardware back button
+  React.useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state?.authMode) {
+        setViewMode(e.state.authMode);
+      } else {
+        setViewMode('login');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Clear errors and push state upon switching tabs
   const handleSwitchMode = (mode: AuthViewMode) => {
     audioFX.playClickSound();
     setErrorMessage(null);
     setViewMode(mode);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ authMode: mode }, '', window.location.pathname);
+    }
   };
 
   // 1. Handle Login Submission
@@ -174,6 +190,20 @@ export const LoginView: React.FC = () => {
 
   return (
     <AuthLayout>
+      {/* Top Back Button (When in Sign Up, Forgot Password, or Reset Confirmation) */}
+      {viewMode !== 'login' && (
+        <div className="mb-3 text-left">
+          <button
+            type="button"
+            onClick={() => handleSwitchMode('login')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-slate-200 transition-all cursor-pointer select-none active:scale-95"
+          >
+            <ArrowLeft className="w-4 h-4 text-[#00d2ff]" />
+            <span>Back to Login</span>
+          </button>
+        </div>
+      )}
+
       {/* Dynamic Header */}
       <AuthHeader 
         title={
