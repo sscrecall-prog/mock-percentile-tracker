@@ -1,7 +1,8 @@
 import React from 'react';
-import { Sparkles, Plus, TrendingUp, Target, Award, ArrowUpRight } from 'lucide-react';
+import { Sparkles, TrendingUp, Target, Award, ArrowUpRight, Zap, BookOpen } from 'lucide-react';
 import { useMocks } from '../../context/MockContext';
 import { Hero3DCanvas } from '../3d/Hero3DCanvas';
+import { audioFX } from '../../utils/audioFX';
 
 export const HeroSection: React.FC = () => {
   const { kpis, settings, setIsAddModalOpen, setEditingMock, setActiveView } = useMocks();
@@ -85,25 +86,50 @@ export const HeroSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Action CTAs */}
-          <div className="flex items-center gap-3 pt-1">
+          {/* Action CTAs: Direct Section Navigation */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2">
             <button
               onClick={() => {
-                setEditingMock(null);
-                setIsAddModalOpen(true);
+                audioFX.playClickSound();
+                setActiveView('full-length');
               }}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-electric-blue to-mint text-darkBg font-extrabold text-xs sm:text-sm shadow-glow-blue hover:opacity-90 transition-all active:scale-95"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#0066ff] via-[#8b5cf6] to-[#d946ef] text-white font-extrabold text-xs sm:text-sm shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_rgba(217,70,239,0.6)] hover:scale-[1.02] active:scale-95 transition-all"
             >
-              <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Log Mock Test</span>
+              <Target className="w-4 h-4" />
+              <span>Full Length Mocks</span>
             </button>
 
             <button
-              onClick={() => setActiveView('analytics')}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-white/5 text-slate-800 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 font-bold text-xs sm:text-sm transition-all"
+              onClick={() => {
+                audioFX.playClickSound();
+                setActiveView('sectional');
+              }}
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-white font-bold text-xs sm:text-sm transition-all active:scale-95"
             >
-              <span>View Analytics</span>
-              <ArrowUpRight className="w-4 h-4" />
+              <Zap className="w-4 h-4 text-[#00d2ff]" />
+              <span>Sectionals</span>
+            </button>
+
+            <button
+              onClick={() => {
+                audioFX.playClickSound();
+                setActiveView('chapter-wise');
+              }}
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-white font-bold text-xs sm:text-sm transition-all active:scale-95"
+            >
+              <BookOpen className="w-4 h-4 text-[#ec4899]" />
+              <span>Chapter Hub</span>
+            </button>
+
+            <button
+              onClick={() => {
+                audioFX.playClickSound();
+                setActiveView('analytics');
+              }}
+              className="flex items-center gap-1 px-3 py-2.5 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-bold text-xs sm:text-sm transition-all"
+            >
+              <span>Analytics</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
 

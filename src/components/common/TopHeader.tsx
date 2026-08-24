@@ -175,16 +175,6 @@ export const TopHeader: React.FC = () => {
             S
           </div>
 
-          {/* 3. MOBILE ADD MOCK BUTTON (ALWAYS VISIBLE ON MOBILE HEADER!) */}
-          <button
-            onClick={handleOpenAddMock}
-            title="Log New Mock"
-            className="flex md:hidden items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-[#0066ff] via-[#8b5cf6] to-[#d946ef] text-white font-black text-xs shadow-cyber-cta shrink-0 active:scale-90 transition-transform whitespace-nowrap"
-          >
-            <Plus className="w-3.5 h-3.5 stroke-[3]" />
-            <span>Add</span>
-          </button>
-
         </div>
 
       </div>
