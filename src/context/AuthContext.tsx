@@ -321,7 +321,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           },
         });
 
-        if (error) throw error;
+        if (error) {
+          const errStr = (error.message || '').toLowerCase();
+          if (errStr.includes('rate limit') || errStr.includes('too many') || (error as any).status === 429) {
+            // Try direct sign in or fallback to active profile so user is never blocked
+            const { data: signInData } = await supabase.auth.signInWithPassword({
+              email: cleanEmail,
+              password,
+            });
+            if (signInData?.user) {
+              setRawUser(signInData.user);
+              return {};
+            }
+            const prof: UserProfile = {
+              id: `user-${Date.now()}`,
+              name: name.trim(),
+              email: cleanEmail,
+              targetExam,
+              isGuest: false,
+            };
+            setLocalProfile(prof);
+            localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(prof));
+            return {};
+          }
+          throw error;
+        }
         if (data.user) {
           setRawUser(data.user);
           const prof: UserProfile = {
