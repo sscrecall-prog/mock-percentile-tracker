@@ -7,7 +7,6 @@ import { MobileNavigation } from './components/common/MobileNavigation';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 import { ToastContainer } from './components/common/ToastContainer';
 import { AddEditMockModal } from './components/forms/AddEditMockModal';
-import { WelcomeScreen } from './components/common/WelcomeScreen';
 
 // Views
 import { HomeView } from './views/HomeView';
@@ -21,7 +20,6 @@ import { SettingsView } from './views/SettingsView';
 
 const AppContent: React.FC = () => {
   const { activeView } = useMocks();
-  const [isWelcomeOpen, setIsWelcomeOpen] = React.useState(true);
 
   return (
     <div className="min-h-screen flex transition-colors duration-300 bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white">
@@ -54,11 +52,7 @@ const AppContent: React.FC = () => {
         </footer>
       </div>
 
-      {/* 3. Global Modals, Notifications & Welcome Screen */}
-      <WelcomeScreen 
-        isOpen={isWelcomeOpen} 
-        onClose={() => setIsWelcomeOpen(false)} 
-      />
+      {/* 3. Global Modals & Notifications */}
       <AddEditMockModal />
       <GlobalSearchModal />
       <ToastContainer />
