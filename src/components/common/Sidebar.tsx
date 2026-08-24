@@ -15,9 +15,11 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 import { useMocks, NavView } from '../../context/MockContext';
+import { useAuth } from '../../context/AuthContext';
 import { audioFX } from '../../utils/audioFX';
 
 export const Sidebar: React.FC = () => {
+  const { user, setIsAuthModalOpen } = useAuth();
   const { 
     activeView, 
     setActiveView, 
@@ -151,24 +153,40 @@ export const Sidebar: React.FC = () => {
           </div>
         </a>
 
-        {/* Aspirant Profile & Level XP Progress Card */}
-        <div className="p-3 rounded-2xl bg-slate-100/80 dark:bg-[#050814]/90 border border-slate-200 dark:border-white/5 space-y-2">
+        {/* Aspirant Profile & Level XP Progress Card (Click to manage Cloud Sync / Google Login) */}
+        <div 
+          onClick={() => {
+            audioFX.playClickSound();
+            setIsAuthModalOpen(true);
+          }}
+          title={user ? '2-Way Cloud Sync Active • Click to manage account' : 'Click to Sign In with Google for PC & Mobile Sync'}
+          className="p-3 rounded-2xl bg-slate-100/80 dark:bg-[#050814]/90 border border-slate-200 dark:border-white/5 hover:border-[#00d2ff]/40 space-y-2 cursor-pointer transition-all group"
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#8b5cf6] via-[#ec4899] to-[#00d2ff] flex items-center justify-center text-white font-black text-xs shadow-glow-purple">
-                S
-              </div>
-              <div>
-                <div className="text-[11px] font-black text-slate-900 dark:text-white tracking-tight">
-                  SUNNY RISE
+              {user?.avatarUrl ? (
+                <img 
+                  src={user.avatarUrl} 
+                  alt={user.name || 'User Avatar'} 
+                  className="w-7 h-7 rounded-xl object-cover border border-[#00d2ff] shadow-glow-cyan shrink-0" 
+                />
+              ) : (
+                <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#8b5cf6] via-[#ec4899] to-[#00d2ff] flex items-center justify-center text-white font-black text-xs shadow-glow-purple shrink-0">
+                  {user?.name ? user.name[0]?.toUpperCase() : 'S'}
                 </div>
-                <div className="text-[9px] font-semibold text-slate-500 dark:text-slate-400">
-                  {gamification.levelTitle}
+              )}
+              <div className="min-w-0">
+                <div className="text-[11px] font-black text-slate-900 dark:text-white tracking-tight truncate group-hover:text-[#00d2ff] transition-colors">
+                  {user?.name || 'SUNNY RISE'}
+                </div>
+                <div className="text-[9px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <span>{user ? 'Cloud Synced' : gamification.levelTitle}</span>
+                  {user && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
                 </div>
               </div>
             </div>
 
-            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-[#8b5cf6]/20 text-[#8b5cf6] dark:text-[#a855f7] border border-[#8b5cf6]/30">
+            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-[#8b5cf6]/20 text-[#8b5cf6] dark:text-[#a855f7] border border-[#8b5cf6]/30 shrink-0">
               Lvl {gamification.level}
             </span>
           </div>

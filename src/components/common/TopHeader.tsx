@@ -13,13 +13,13 @@ import {
 } from 'lucide-react';
 import { useMocks } from '../../context/MockContext';
 import { useTheme } from '../../theme/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import { audioFX } from '../../utils/audioFX';
 
 export const TopHeader: React.FC = () => {
+  const { user, isSyncing, setIsAuthModalOpen } = useAuth();
   const { 
     setIsSearchModalOpen, 
-    setIsAddModalOpen, 
-    setEditingMock, 
     gamification, 
     isSoundEnabled, 
     toggleSound,
@@ -31,12 +31,6 @@ export const TopHeader: React.FC = () => {
   const handleOpenSearch = () => {
     audioFX.playClickSound();
     setIsSearchModalOpen(true);
-  };
-
-  const handleOpenAddMock = () => {
-    audioFX.playClickSound();
-    setEditingMock(null);
-    setIsAddModalOpen(true);
   };
 
   return (
@@ -163,17 +157,34 @@ export const TopHeader: React.FC = () => {
             )}
           </button>
 
-          {/* 2. USER PROFILE AVATAR (ALWAYS VISIBLE ON MOBILE & DESKTOP!) */}
-          <div 
+          {/* 2. CLOUD SYNC & GOOGLE PROFILE AVATAR (ALWAYS VISIBLE ON MOBILE & DESKTOP!) */}
+          <button 
             onClick={() => {
               audioFX.playClickSound();
-              setActiveView('settings');
+              setIsAuthModalOpen(true);
             }}
-            title="Sunny Rise • Settings & Profile"
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-tr from-[#8b5cf6] via-[#ec4899] to-[#00d2ff] flex items-center justify-center text-white font-black text-xs shadow-glow-purple shrink-0 cursor-pointer active:scale-90 transition-transform"
+            title={user ? `${user.name} • 2-Way Cloud Sync Active (Click to manage)` : 'Click to Sign in with Google (Sync PC & Mobile)'}
+            className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-xl overflow-hidden flex items-center justify-center text-white font-black text-xs shadow-glow-purple shrink-0 active:scale-90 transition-all group"
           >
-            S
-          </div>
+            {user?.avatarUrl ? (
+              <img 
+                src={user.avatarUrl} 
+                alt={user.name || 'User Avatar'} 
+                className="w-full h-full object-cover rounded-xl border border-[#00d2ff]" 
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-tr from-[#8b5cf6] via-[#ec4899] to-[#00d2ff] flex items-center justify-center font-black text-white">
+                {user?.name ? user.name[0]?.toUpperCase() : 'S'}
+              </div>
+            )}
+
+            {/* Cloud Status Dot */}
+            <span 
+              className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-[#0c1228] ${
+                user ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-amber-400'
+              } ${isSyncing ? 'animate-ping' : ''}`} 
+            />
+          </button>
 
         </div>
 

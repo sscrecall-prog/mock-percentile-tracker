@@ -1,5 +1,6 @@
 import React from 'react';
 import { ThemeProvider } from './theme/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
 import { MockProvider, useMocks } from './context/MockContext';
 import { Sidebar } from './components/common/Sidebar';
 import { TopHeader } from './components/common/TopHeader';
@@ -7,6 +8,7 @@ import { MobileNavigation } from './components/common/MobileNavigation';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 import { ToastContainer } from './components/common/ToastContainer';
 import { AddEditMockModal } from './components/forms/AddEditMockModal';
+import { AuthModal } from './components/auth/AuthModal';
 
 // Views
 import { HomeView } from './views/HomeView';
@@ -53,6 +55,7 @@ const AppContent: React.FC = () => {
       </div>
 
       {/* 3. Global Modals & Notifications */}
+      <AuthModal />
       <AddEditMockModal />
       <GlobalSearchModal />
       <ToastContainer />
@@ -66,9 +69,11 @@ const AppContent: React.FC = () => {
 export function App() {
   return (
     <ThemeProvider>
-      <MockProvider>
-        <AppContent />
-      </MockProvider>
+      <AuthProvider>
+        <MockProvider>
+          <AppContent />
+        </MockProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

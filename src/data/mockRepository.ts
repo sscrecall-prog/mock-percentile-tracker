@@ -12,6 +12,11 @@ export class MockRepository {
     return [...this.mocks];
   }
 
+  saveAll(mocks: MockTest[]): void {
+    this.mocks = [...mocks];
+    StorageService.saveMocks(this.mocks);
+  }
+
   getById(id: string): MockTest | undefined {
     return this.mocks.find(m => m.id === id);
   }

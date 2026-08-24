@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
 import { 
   MockTest, 
   MockFilters, 
@@ -16,6 +16,9 @@ import { calculateOverallKPIs, calculateSubjectStats } from '../engine/analytics
 import { diagnoseWeakSections, generatePerformanceInsights } from '../engine/feedbackEngine';
 import { audioFX } from '../utils/audioFX';
 import { triggerCelebrationConfetti } from '../utils/confettiFX';
+import { useAuth } from './AuthContext';
+import { CloudSyncService, dbRowToMock } from '../services/cloudSyncService';
+import { getSupabase } from '../services/supabaseClient';
 
 export type NavView = 'home' | 'mocks' | 'full-length' | 'sectional' | 'chapter-wise' | 'analytics' | 'percentile' | 'settings';
 
@@ -125,6 +128,7 @@ const repository = new MockRepository();
 const MockContext = createContext<MockContextType | undefined>(undefined);
 
 export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, setIsSyncing } = useAuth();
   const [mocks, setMocks] = useState<MockTest[]>(() => repository.getAll());
   const [settings, setSettings] = useState<UserSettings>(() => StorageService.loadSettings());
   const [customPlatforms, setCustomPlatforms] = useState<string[]>(() => StorageService.loadCustomPlatforms());
@@ -151,6 +155,106 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 4000);
   }, []);
+
+  // -------------------------------------------------------------
+  // REAL-TIME TWO-WAY CLOUD SYNC ENGINE (PC <-> MOBILE)
+  // -------------------------------------------------------------
+  useEffect(() => {
+    if (!user?.id) return;
+    let isSubscribed = true;
+
+    // 1. Initial Cloud Sync & Local Migration
+    const performInitialSync = async () => {
+      setIsSyncing(true);
+      try {
+        const cloudMocks = await CloudSyncService.fetchCloudMocks(user.id);
+        if (!isSubscribed) return;
+
+        const localMocks = repository.getAll();
+        
+        if (cloudMocks.length > 0) {
+          // Find any local mocks that aren't on the cloud yet and upload them
+          const unbackedLocalMocks = localMocks.filter(
+            lm => !cloudMocks.some(cm => cm.id === lm.id)
+          );
+
+          if (unbackedLocalMocks.length > 0) {
+            await CloudSyncService.batchUploadMocks(unbackedLocalMocks, user.id);
+          }
+
+          // Merge and store
+          const mergedMocks = [...cloudMocks, ...unbackedLocalMocks].sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+
+          repository.saveAll(mergedMocks);
+          setMocks(mergedMocks);
+          showToast(`Cloud Synced: ${mergedMocks.length} mock tests active ☁️`);
+        } else if (localMocks.length > 0) {
+          // Cloud is new/empty, migrate local mocks to cloud
+          await CloudSyncService.batchUploadMocks(localMocks, user.id);
+          showToast(`Backed up ${localMocks.length} mocks to your cloud account ☁️`);
+        }
+      } catch (err) {
+        console.error('Error during initial cloud sync:', err);
+      } finally {
+        if (isSubscribed) setIsSyncing(false);
+      }
+    };
+
+    performInitialSync();
+
+    // 2. Real-Time WebSocket Channel Listener for Multi-Device Updates
+    const supabase = getSupabase();
+    if (!supabase) return;
+
+    const channel = supabase
+      .channel(`realtime-mocks-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'mock_tests',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          if (!isSubscribed) return;
+
+          if (payload.eventType === 'INSERT') {
+            const incomingMock = dbRowToMock(payload.new);
+            setMocks((prev) => {
+              if (prev.some((m) => m.id === incomingMock.id)) return prev;
+              const next = [incomingMock, ...prev];
+              repository.saveAll(next);
+              return next;
+            });
+            audioFX.playSuccessChime();
+            showToast(`New test "${incomingMock.testName}" synced from other device! ⚡`);
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedMock = dbRowToMock(payload.new);
+            setMocks((prev) => {
+              const next = prev.map((m) => (m.id === updatedMock.id ? updatedMock : m));
+              repository.saveAll(next);
+              return next;
+            });
+          } else if (payload.eventType === 'DELETE') {
+            const deletedId = payload.old.id;
+            setMocks((prev) => {
+              const next = prev.filter((m) => m.id !== deletedId);
+              repository.saveAll(next);
+              return next;
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isSubscribed = false;
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, setIsSyncing, showToast]);
 
   const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.filter(t => t.id !== id));
@@ -469,6 +573,9 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addMock = useCallback((mockData: Omit<MockTest, 'id' | 'createdAt'>) => {
     const created = repository.create(mockData);
     setMocks(repository.getAll());
+    if (user?.id) {
+      CloudSyncService.upsertMock(created, user.id);
+    }
     if (created.isClearedCutoff || created.accuracy >= 90) {
       audioFX.playAchievementSound();
       triggerCelebrationConfetti();
@@ -477,36 +584,45 @@ export const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     showToast(`Mock "${created.testName}" logged! +100 XP ⚡`);
     return created;
-  }, [showToast]);
+  }, [showToast, user?.id]);
 
   const editMock = useCallback((id: string, updates: Partial<MockTest>) => {
     const updated = repository.update(id, updates);
     if (updated) {
       setMocks(repository.getAll());
+      if (user?.id) {
+        CloudSyncService.upsertMock(updated, user.id);
+      }
       audioFX.playSuccessChime();
       showToast(`Mock "${updated.testName}" updated.`);
     }
-  }, [showToast]);
+  }, [showToast, user?.id]);
 
   const deleteMock = useCallback((id: string) => {
     const mock = repository.getById(id);
     const name = mock?.testName || 'Mock';
     repository.delete(id);
     setMocks(repository.getAll());
+    if (user?.id) {
+      CloudSyncService.deleteMock(id, user.id);
+    }
     setSelectedMockIds(prev => prev.filter(item => item !== id));
     if (viewingMockDetail?.id === id) setViewingMockDetail(null);
     audioFX.playClickSound();
     showToast(`Deleted "${name}".`, 'info');
-  }, [showToast, viewingMockDetail]);
+  }, [showToast, viewingMockDetail, user?.id]);
 
   const duplicateMock = useCallback((id: string) => {
     const copy = repository.duplicate(id);
     if (copy) {
       setMocks(repository.getAll());
+      if (user?.id) {
+        CloudSyncService.upsertMock(copy, user.id);
+      }
       audioFX.playSuccessChime();
       showToast(`Duplicated "${copy.testName}".`);
     }
-  }, [showToast]);
+  }, [showToast, user?.id]);
 
   const toggleMockSelection = useCallback((id: string) => {
     setSelectedMockIds(prev => {
