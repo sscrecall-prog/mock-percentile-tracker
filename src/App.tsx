@@ -25,13 +25,18 @@ const AppContent: React.FC = () => {
   const { user, isLoading } = useAuth();
   const { activeView } = useMocks();
 
-  // Loading State
+  // Loading State (Prevents flashing login screen during session verification)
   if (isLoading) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-[#050814] text-white">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-full border-2 border-[#00d2ff] border-t-transparent animate-spin" />
-          <span className="text-xs font-bold text-slate-400">Loading MockTracker 3D...</span>
+        <div className="flex flex-col items-center gap-4 animate-fadeIn">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#00d2ff]/20 via-[#8b5cf6]/20 to-[#ec4899]/20 border border-white/15 p-2.5 shadow-glow-cyan">
+            <img src="/logo.png" alt="MockTracker 3D" className="w-full h-full object-contain select-none" />
+          </div>
+          <div className="flex items-center gap-2.5">
+            <div className="w-4 h-4 rounded-full border-2 border-[#00d2ff] border-t-transparent animate-spin" />
+            <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">Restoring Session...</span>
+          </div>
         </div>
       </div>
     );

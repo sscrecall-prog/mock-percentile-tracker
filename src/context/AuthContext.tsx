@@ -368,11 +368,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         return {};
       } catch (err: any) {
-        return { error: err.message || 'Invalid email or password.' };
+        return { error: err.message || 'Incorrect email or password.' };
       }
+    } else {
+      if (localProfile) {
+        return {};
+      }
+      const prof: UserProfile = {
+        id: `user-${Date.now()}`,
+        name: cleanEmail.split('@')[0],
+        email: cleanEmail,
+        targetExam: 'SSC CGL',
+        isGuest: false,
+      };
+      setLocalProfile(prof);
+      localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(prof));
+      return {};
     }
-    return { error: 'Please sign in using Phone Number OTP.' };
-  }, []);
+  }, [localProfile]);
 
   const signInWithGoogle = useCallback(async (): Promise<{ error?: string }> => {
     const supabase = getSupabase();
