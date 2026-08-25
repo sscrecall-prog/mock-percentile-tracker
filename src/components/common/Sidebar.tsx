@@ -52,7 +52,7 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="hidden md:flex flex-col w-64 shrink-0 h-screen fixed left-0 top-0 bottom-0 bg-white/95 dark:bg-[#0c1228]/95 backdrop-blur-2xl border-r border-slate-200/80 dark:border-slate-800/80 z-30 overflow-y-auto no-scrollbar justify-between p-4 space-y-4">
+    <aside className="hidden md:flex flex-col w-64 shrink-0 h-screen fixed left-0 top-0 bottom-0 bg-[#FFFDF9]/95 dark:bg-[#0c1228]/95 backdrop-blur-2xl border-r border-[#6B7280]/20 dark:border-slate-800/80 z-30 overflow-y-auto no-scrollbar justify-between p-4 space-y-4">
       
       {/* 1. Top Section: Logo & Add Mock CTA */}
       <div className="space-y-4">
@@ -67,13 +67,13 @@ export const Sidebar: React.FC = () => {
             className="w-9 h-9 rounded-xl object-contain shadow-glow-cyan group-hover:scale-105 transition-transform duration-300 shrink-0" 
           />
           <div>
-            <div className="font-black text-sm tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
-              <span className="bg-gradient-to-r from-[#00d2ff] via-[#a855f7] to-[#ec4899] bg-clip-text text-transparent">MOCKTRACKER</span>
-              <span className="text-[8px] font-black px-1 py-0.2 rounded bg-cyan-500/15 text-cyan-600 dark:text-[#00d2ff] border border-cyan-500/30 uppercase">
+            <div className="font-black text-sm tracking-tight text-[#171717] dark:text-white flex items-center gap-1.5">
+              <span className="bg-gradient-to-r from-[#D4AF37] to-[#171717] dark:from-[#00d2ff] dark:via-[#a855f7] dark:to-[#ec4899] bg-clip-text text-transparent">MOCKTRACKER</span>
+              <span className="text-[8px] font-black px-1 py-0.2 rounded bg-[#D4AF37]/15 text-[#B8860B] dark:text-[#00d2ff] border border-[#D4AF37]/30 uppercase">
                 3D
               </span>
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+            <p className="text-[10px] text-[#6B7280] dark:text-slate-400 font-bold uppercase tracking-wider">
               PERCENTILE PRO
             </p>
           </div>
@@ -82,7 +82,7 @@ export const Sidebar: React.FC = () => {
         {/* Full-width Neon CTA Button */}
         <button
           onClick={handleOpenAddMock}
-          className="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-[#0066ff] via-[#8b5cf6] to-[#d946ef] text-white font-extrabold text-xs shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_rgba(217,70,239,0.65)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          className="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-[#171717] via-[#D4AF37] to-[#B8860B] dark:from-[#0066ff] dark:via-[#8b5cf6] dark:to-[#d946ef] text-white font-extrabold text-xs shadow-[0_0_20px_rgba(212,175,55,0.35)] dark:shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4 stroke-[3]" />
           <span>Add New Mock</span>
@@ -98,13 +98,13 @@ export const Sidebar: React.FC = () => {
                 onClick={() => handleNavClick(item.id)}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition-all duration-200 text-left group ${
                   isActive
-                    ? 'bg-gradient-to-r from-[#00d2ff]/15 via-[#8b5cf6]/15 to-transparent text-[#00d2ff] dark:text-[#00d2ff] border-l-4 border-[#00d2ff] font-black pl-2.5 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                    ? 'bg-gradient-to-r from-[#D4AF37]/15 via-[#F5E6C8]/40 to-transparent dark:from-[#00d2ff]/15 dark:via-[#8b5cf6]/15 dark:to-transparent text-[#171717] dark:text-[#00d2ff] border-l-4 border-[#D4AF37] dark:border-[#00d2ff] font-black pl-2.5 shadow-sm'
+                    : 'text-[#6B7280] dark:text-slate-400 hover:text-[#171717] dark:hover:text-white hover:bg-[#EADCBF]/30 dark:hover:bg-white/5'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`transition-transform duration-200 group-hover:scale-110 ${
-                    isActive ? 'text-[#00d2ff]' : 'text-slate-400 dark:text-slate-500'
+                    isActive ? 'text-[#D4AF37] dark:text-[#00d2ff]' : 'text-[#6B7280] dark:text-slate-500'
                   }`}>
                     {item.icon}
                   </div>

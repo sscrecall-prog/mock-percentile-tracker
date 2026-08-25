@@ -57,6 +57,14 @@ export default {
         orangeAccent: '#FB923C',
         amberAccent: '#F59E0B',
 
+        // Luxury Light Mode Theme (#171717, #6B7280, #D4AF37, #F5E6C8)
+        luxury: {
+          charcoal: '#171717',
+          gray: '#6B7280',
+          gold: '#D4AF37',
+          champagne: '#F5E6C8',
+        },
+
         // Deep Space & Cyber Glass Surfaces (Dark Mode Default)
         darkBg: '#050814',
         darkSurface: '#0C1228',
@@ -65,19 +73,22 @@ export default {
         darkCard: '#0C1228',
         darkBorder: 'rgba(255, 255, 255, 0.09)',
 
-        // Light mode surfaces (Crisp porcelain)
-        lightBg: '#F8FAFC',
-        lightSurface: '#FFFFFF',
-        lightContainer: '#F1F5F9',
-        lightCard: '#FFFFFF',
-        lightBorder: 'rgba(15, 23, 42, 0.08)',
+        // Light mode surfaces (Luxury Champagne & Charcoal #F5E6C8, #171717)
+        lightBg: '#F5E6C8',
+        lightSurface: '#FFFDF9',
+        lightContainer: '#EADCBF',
+        lightCard: '#FFFDF9',
+        lightBorder: 'rgba(107, 114, 128, 0.22)',
+        lightText: '#171717',
+        lightMuted: '#6B7280',
+        lightGold: '#D4AF37',
 
         // Warm Cream mode surfaces
-        warmBg: '#F7F4EE',
+        warmBg: '#F5E6C8',
         warmSurface: '#FFFDF9',
-        warmContainer: '#ECE5D8',
+        warmContainer: '#EADCBF',
         warmCard: '#FFFDF9',
-        warmBorder: 'rgba(30, 41, 59, 0.08)',
+        warmBorder: 'rgba(107, 114, 128, 0.22)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],

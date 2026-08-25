@@ -111,9 +111,9 @@ export const PreferencesForm: React.FC = () => {
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { id: 'dark', label: 'Dark Obsidian', icon: <Moon className="w-4 h-4 text-electric-blue" />, desc: 'AI Command Center' },
-              { id: 'light', label: 'Day White', icon: <Sun className="w-4 h-4 text-amber-500" />, desc: 'High Contrast Clean' },
-              { id: 'warm-cream', label: 'Warm Cream', icon: <span className="text-sm">📜</span>, desc: 'Editorial Paper' },
+              { id: 'dark', label: 'Dark Obsidian', icon: <Moon className="w-4 h-4 text-electric-blue" />, desc: '#050814 Deep Space' },
+              { id: 'light', label: 'Luxury Light', icon: <Sun className="w-4 h-4 text-[#D4AF37]" />, desc: '#171717, #D4AF37 & #F5E6C8' },
+              { id: 'warm-cream', label: 'Warm Champagne', icon: <span className="text-sm">✨</span>, desc: 'Editorial Royal Cream' },
               { id: 'system', label: 'System Auto', icon: <Sliders className="w-4 h-4 text-lavender" />, desc: 'Follow OS preference' },
             ].map((t) => (
               <button

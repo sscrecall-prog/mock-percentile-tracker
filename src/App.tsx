@@ -54,7 +54,7 @@ const AppContent: React.FC = () => {
 
   // 2. Authenticated Dashboard Experience
   return (
-    <div className="min-h-screen flex transition-colors duration-300 bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white">
+    <div className="min-h-screen flex transition-colors duration-300 bg-[#F5E6C8]/60 dark:bg-darkBg text-[#171717] dark:text-white">
       {/* Left Fixed Sidebar (Desktop >= md) */}
       <Sidebar />
 

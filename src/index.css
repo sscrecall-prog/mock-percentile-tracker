@@ -3,14 +3,15 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --bg-primary: #F8FAFC;
-    --bg-surface: #FFFFFF;
-    --bg-container: #F1F5F9;
-    --border-color: rgba(15, 23, 42, 0.08);
-    --text-primary: #0F172A;
-    --text-secondary: #334155;
-    --text-muted: #64748B;
+  :root, .light {
+    --bg-primary: #F5E6C8;
+    --bg-surface: #FFFDF9;
+    --bg-container: #EADCBF;
+    --border-color: rgba(107, 114, 128, 0.22);
+    --text-primary: #171717;
+    --text-secondary: #6B7280;
+    --text-muted: #6B7280;
+    --accent-gold: #D4AF37;
   }
 
   .dark {
@@ -21,16 +22,18 @@
     --text-primary: #FFFFFF;
     --text-secondary: #94A3B8;
     --text-muted: #64748B;
+    --accent-gold: #D4AF37;
   }
 
   .warm-cream {
-    --bg-primary: #F7F4EE;
+    --bg-primary: #F5E6C8;
     --bg-surface: #FFFDF9;
-    --bg-container: #ECE5D8;
-    --border-color: rgba(30, 41, 59, 0.08);
-    --text-primary: #1E293B;
-    --text-secondary: #334155;
-    --text-muted: #475569;
+    --bg-container: #EADCBF;
+    --border-color: rgba(107, 114, 128, 0.22);
+    --text-primary: #171717;
+    --text-secondary: #6B7280;
+    --text-muted: #6B7280;
+    --accent-gold: #D4AF37;
   }
 
   body {
@@ -40,11 +43,20 @@
   }
 }
 
-/* Dual Radial Ambient Aura for Deep Space Canvas */
+/* Dual Radial Ambient Aura for Deep Space Canvas (Dark Mode) */
 .dark body {
   background-image: 
     radial-gradient(ellipse at 50% -10%, rgba(0, 210, 255, 0.12), transparent 70%),
     radial-gradient(ellipse at 50% 110%, rgba(236, 72, 153, 0.10), transparent 70%);
+  background-attachment: fixed;
+}
+
+/* Luxury Champagne Ambient Aura for Light Mode (#F5E6C8 + #D4AF37) */
+.light body, .warm-cream body {
+  background-color: #F5E6C8;
+  background-image: 
+    radial-gradient(ellipse at 50% -10%, rgba(212, 175, 55, 0.18), transparent 65%),
+    radial-gradient(ellipse at 50% 110%, rgba(245, 230, 200, 0.45), transparent 70%);
   background-attachment: fixed;
 }
 
@@ -56,21 +68,23 @@
   border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
-.light .glass-panel {
-  background: rgba(255, 255, 255, 0.88);
+.light .glass-panel, .warm-cream .glass-panel {
+  background: rgba(255, 253, 249, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-}
-
-.warm-cream .glass-panel {
-  background: rgba(255, 253, 249, 0.88);
-  border: 1px solid rgba(30, 41, 59, 0.08);
+  border: 1px solid rgba(107, 114, 128, 0.22);
+  box-shadow: 0 4px 20px -2px rgba(23, 23, 23, 0.04);
 }
 
 /* Neon Gradient Typography */
 .neon-gradient-text {
   background: linear-gradient(135deg, #00D2FF 0%, #A855F7 50%, #EC4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.light .neon-gradient-text, .warm-cream .neon-gradient-text {
+  background: linear-gradient(135deg, #171717 0%, #D4AF37 55%, #B8860B 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

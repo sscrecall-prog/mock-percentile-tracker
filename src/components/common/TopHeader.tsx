@@ -38,7 +38,7 @@ export const TopHeader: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full backdrop-blur-xl border-b transition-colors duration-300 bg-white/90 dark:bg-[#0c1228]/85 warm-cream:bg-warmBg/90 border-slate-200/80 dark:border-slate-800/80 shadow-sm">
+    <header className="sticky top-0 z-30 w-full backdrop-blur-xl border-b transition-colors duration-300 bg-[#FFFDF9]/90 dark:bg-[#0c1228]/85 warm-cream:bg-[#FFFDF9]/90 border-[#6B7280]/20 dark:border-slate-800/80 shadow-sm">
       <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
         
         {/* Left Section: Back Button OR Brand Logo on Mobile */}
@@ -48,9 +48,9 @@ export const TopHeader: React.FC = () => {
               type="button"
               onClick={navigateBack}
               title="Go Back"
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 border border-slate-300 dark:border-white/10 text-xs font-bold text-slate-800 dark:text-white transition-all cursor-pointer select-none active:scale-95 shadow-sm"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#EADCBF]/40 dark:bg-white/10 hover:bg-[#EADCBF]/70 dark:hover:bg-white/15 border border-[#6B7280]/20 dark:border-white/10 text-xs font-bold text-[#171717] dark:text-white transition-all cursor-pointer select-none active:scale-95 shadow-sm"
             >
-              <ArrowLeft className="w-4 h-4 text-[#00d2ff]" />
+              <ArrowLeft className="w-4 h-4 text-[#D4AF37] dark:text-[#00d2ff]" />
               <span className="hidden sm:inline">Back</span>
             </button>
           )}
@@ -69,9 +69,9 @@ export const TopHeader: React.FC = () => {
               className="w-7 h-7 rounded-xl object-contain shadow-glow-cyan shrink-0" 
             />
             <div className="shrink-0">
-              <div className="font-black text-xs tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
-                <span className="bg-gradient-to-r from-[#00d2ff] via-[#a855f7] to-[#ec4899] bg-clip-text text-transparent">MockTracker</span>
-                <span className="text-[8px] font-black px-1 py-0.2 rounded bg-cyan-500/15 text-cyan-500 dark:text-[#00d2ff] border border-cyan-500/30 uppercase">
+              <div className="font-black text-xs tracking-tight text-[#171717] dark:text-white flex items-center gap-1">
+                <span className="bg-gradient-to-r from-[#D4AF37] to-[#171717] dark:from-[#00d2ff] dark:via-[#a855f7] dark:to-[#ec4899] bg-clip-text text-transparent">MockTracker</span>
+                <span className="text-[8px] font-black px-1 py-0.2 rounded bg-[#D4AF37]/15 text-[#B8860B] dark:text-[#00d2ff] border border-[#D4AF37]/30 uppercase">
                   3D
                 </span>
               </div>
@@ -80,12 +80,12 @@ export const TopHeader: React.FC = () => {
 
           {/* Desktop Left: Target Exam & Benchmark Badges (Visible md and above) */}
           <div className="hidden md:flex items-center gap-2 shrink-0">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-800 dark:text-slate-200">
-              <Target className="w-3.5 h-3.5 text-[#00d2ff]" />
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-[#EADCBF]/30 dark:bg-white/5 border border-[#6B7280]/20 dark:border-white/10 text-xs font-bold text-[#171717] dark:text-slate-200">
+              <Target className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#00d2ff]" />
               <span>Target Exam: {settings.selectedExam || 'SSC CGL'}</span>
             </div>
 
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-[#8b5cf6]/10 to-[#ec4899]/10 border border-[#8b5cf6]/20 text-[11px] font-extrabold text-[#8b5cf6] dark:text-[#a855f7]">
+            <div className="flex items-center gap-1 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-[#D4AF37]/15 to-[#F5E6C8]/40 dark:from-[#8b5cf6]/10 dark:to-[#ec4899]/10 border border-[#D4AF37]/30 dark:border-[#8b5cf6]/20 text-[11px] font-extrabold text-[#171717] dark:text-[#a855f7]">
               <span>Target: {settings.targetPercentile || 90}%ile</span>
             </div>
           </div>
@@ -98,11 +98,11 @@ export const TopHeader: React.FC = () => {
           <button
             onClick={handleOpenSearch}
             title="Search Mocks (Ctrl+K)"
-            className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-xs font-semibold shrink-0"
+            className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl border border-[#6B7280]/20 dark:border-white/10 bg-[#EADCBF]/30 dark:bg-white/5 text-[#6B7280] dark:text-slate-300 hover:text-[#171717] dark:hover:text-white hover:bg-[#EADCBF]/60 dark:hover:bg-white/10 transition-all text-xs font-semibold shrink-0"
           >
-            <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="hidden xl:inline text-slate-400">Quick search mocks...</span>
-            <kbd className="hidden 2xl:inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-slate-200 dark:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-600 dark:text-slate-400">
+            <Search className="w-3.5 h-3.5 text-[#6B7280] dark:text-slate-400 shrink-0" />
+            <span className="hidden xl:inline text-[#6B7280] dark:text-slate-400">Quick search mocks...</span>
+            <kbd className="hidden 2xl:inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-[#EADCBF]/50 dark:bg-white/10 border border-[#6B7280]/20 dark:border-white/10 text-[#171717] dark:text-slate-400">
               Ctrl+K
             </kbd>
           </button>
